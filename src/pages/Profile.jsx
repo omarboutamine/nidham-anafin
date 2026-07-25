@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom'
-import DashboardShell from '../components/DashboardShell'
+import DashShell from '../components/DashShell'
 import {
   academicYearLabel,
   professionLabel,
@@ -9,9 +9,9 @@ import { useLandingLang } from '../hooks/useLandingLang'
 import { getSessionUser } from '../services/authStore'
 import '../styles/landing-base.css'
 import '../styles/landing-extra.css'
-import '../styles/dashboard-app.css'
+import '../styles/financial.css'
 
-export default function ProfilePage() {
+export default function Profile() {
   const { t, lang } = useLandingLang()
   const user = getSessionUser()
   const d = t.dashboard
@@ -19,7 +19,12 @@ export default function ProfilePage() {
   if (!user) return <Navigate to="/login" replace />
 
   return (
-    <DashboardShell title={d.personalData}>
+    <DashShell user={user} activeNav={null}>
+      <section className="dash-hero">
+        <p className="dash-kicker">{d.personalData}</p>
+        <h1 className="dash-title">{d.profileTitle}</h1>
+      </section>
+
       <section className="dash-panel">
         <dl className="dash-profile-grid">
           <div>
@@ -58,6 +63,6 @@ export default function ProfilePage() {
           )}
         </dl>
       </section>
-    </DashboardShell>
+    </DashShell>
   )
 }

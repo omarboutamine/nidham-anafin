@@ -1,26 +1,31 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import SiteLogo from './SiteLogo'
 import { useLandingLang } from '../hooks/useLandingLang'
-import { getSessionUser, logout } from '../services/authStore'
+import { logout } from '../services/authStore'
 
-export default function DashboardShell({ children, title }) {
+export default function DashShell({ user, children, activeNav }) {
   const { t, dir, lang, setLang } = useLandingLang()
   const navigate = useNavigate()
-  const user = getSessionUser()
   const d = t.dashboard
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef(null)
 
   useEffect(() => {
+    if (!menuOpen) return undefined
     const onDoc = (e) => {
-      if (!menuRef.current?.contains(e.target)) setMenuOpen(false)
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false)
+    }
+    const onKey = (e) => {
+      if (e.key === 'Escape') setMenuOpen(false)
     }
     document.addEventListener('mousedown', onDoc)
-    return () => document.removeEventListener('mousedown', onDoc)
-  }, [])
-
-  if (!user) return null
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDoc)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [menuOpen])
 
   const handleLogout = () => {
     logout()
@@ -30,23 +35,9 @@ export default function DashboardShell({ children, title }) {
   return (
     <div className="dash-page" dir={dir}>
       <header className="dash-header">
-        <div className="dash-header-start">
-          <Link to="/dashboard" className="dash-logo">
-            <SiteLogo />
-          </Link>
-          <nav className="dash-nav" aria-label={d.navAria}>
-            <NavLink to="/dashboard/scf" className={({ isActive }) => `dash-nav-link ${isActive ? 'active' : ''}`}>
-              SCF
-            </NavLink>
-            <NavLink to="/dashboard/bilan" className={({ isActive }) => `dash-nav-link ${isActive ? 'active' : ''}`}>
-              {d.navBilan}
-            </NavLink>
-            <NavLink to="/dashboard/tcr" className={({ isActive }) => `dash-nav-link ${isActive ? 'active' : ''}`}>
-              TCR
-            </NavLink>
-          </nav>
-        </div>
-
+        <Link to="/dashboard" className="dash-logo">
+          <SiteLogo />
+        </Link>
         <div className="dash-header-actions">
           <div className="landing-lang-switch" role="group" aria-label={t.langSwitchLabel}>
             <button
@@ -71,9 +62,9 @@ export default function DashboardShell({ children, title }) {
             <button
               type="button"
               className={`dash-user-chip dash-user-chip--btn ${menuOpen ? 'is-open' : ''}`}
-              onClick={() => setMenuOpen((v) => !v)}
-              aria-expanded={menuOpen}
               aria-haspopup="menu"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((v) => !v)}
             >
               {user.fullName}
               <span className="dash-user-caret" aria-hidden="true">
@@ -82,20 +73,18 @@ export default function DashboardShell({ children, title }) {
             </button>
             {menuOpen && (
               <div className="dash-user-dropdown" role="menu">
-                <button
-                  type="button"
+                <Link
+                  to="/dashboard/profile"
                   role="menuitem"
-                  onClick={() => {
-                    setMenuOpen(false)
-                    navigate('/dashboard/profile')
-                  }}
+                  className="dash-user-dropdown__item"
+                  onClick={() => setMenuOpen(false)}
                 >
                   {d.personalData}
-                </button>
+                </Link>
                 <button
                   type="button"
                   role="menuitem"
-                  className="dash-user-dropdown__danger"
+                  className="dash-user-dropdown__item dash-user-dropdown__item--danger"
                   onClick={handleLogout}
                 >
                   {d.logout}
@@ -106,10 +95,30 @@ export default function DashboardShell({ children, title }) {
         </div>
       </header>
 
-      <main className="dash-main">
-        {title ? <h1 className="dash-page-title">{title}</h1> : null}
-        {children}
-      </main>
+      {activeNav != null && (
+        <nav className="dash-subnav" aria-label={d.statementsNav}>
+          <Link
+            to="/dashboard"
+            className={`dash-subnav__link ${activeNav === 'home' ? 'is-active' : ''}`}
+          >
+            {d.home}
+          </Link>
+          <Link
+            to="/dashboard/bilan"
+            className={`dash-subnav__link ${activeNav === 'bilan' ? 'is-active' : ''}`}
+          >
+            Bilan
+          </Link>
+          <Link
+            to="/dashboard/tcr"
+            className={`dash-subnav__link ${activeNav === 'tcr' ? 'is-active' : ''}`}
+          >
+            TCR
+          </Link>
+        </nav>
+      )}
+
+      <main className="dash-main">{children}</main>
     </div>
   )
 }

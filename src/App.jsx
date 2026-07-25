@@ -4,8 +4,7 @@ import BilanPage from './pages/BilanPage'
 import Dashboard from './pages/Dashboard'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
-import ProfilePage from './pages/ProfilePage'
-import ScfPage from './pages/ScfPage'
+import Profile from './pages/Profile'
 import TcrPage from './pages/TcrPage'
 
 export default function App() {
@@ -26,15 +25,7 @@ export default function App() {
           path="/dashboard/profile"
           element={
             <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/scf"
-          element={
-            <ProtectedRoute>
-              <ScfPage />
+              <Profile />
             </ProtectedRoute>
           }
         />

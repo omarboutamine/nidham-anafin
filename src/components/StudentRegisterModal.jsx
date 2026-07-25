@@ -38,7 +38,6 @@ export default function StudentRegisterModal({ open, onClose, t, dir, lang }) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [expiresAt, setExpiresAt] = useState(0)
-  const [fallbackCode, setFallbackCode] = useState(null)
   const [now, setNow] = useState(Date.now())
 
   useEffect(() => {
@@ -93,7 +92,6 @@ export default function StudentRegisterModal({ open, onClose, t, dir, lang }) {
     setError('')
     setLoading(false)
     setExpiresAt(0)
-    setFallbackCode(null)
     clearPendingOtp()
   }
 
@@ -145,8 +143,11 @@ export default function StudentRegisterModal({ open, onClose, t, dir, lang }) {
         phone: form.phone.trim(),
       }
       const result = await createAndSendOtp({ email: profile.email, profile, lang })
+      if (!result.ok) {
+        setError(r.errors.sendFailed)
+        return
+      }
       setExpiresAt(result.expiresAt)
-      setFallbackCode(result.fallbackCode)
       setOtp('')
       setStep('otp')
     } catch {
@@ -156,14 +157,14 @@ export default function StudentRegisterModal({ open, onClose, t, dir, lang }) {
     }
   }
 
-  const handleVerifyOtp = (e) => {
+  const handleVerifyOtp = async (e) => {
     e.preventDefault()
     setError('')
     if (remainingSec <= 0) {
       setError(r.errors.otpExpired)
       return
     }
-    const result = verifyOtp(otp)
+    const result = await verifyOtp(otp)
     if (!result.ok) {
       setError(result.reason === 'EXPIRED' ? r.errors.otpExpired : r.errors.otpInvalid)
       return
@@ -187,8 +188,11 @@ export default function StudentRegisterModal({ open, onClose, t, dir, lang }) {
         phone: form.phone.trim(),
       }
       const result = await createAndSendOtp({ email: profile.email, profile, lang })
+      if (!result.ok) {
+        setError(r.errors.sendFailed)
+        return
+      }
       setExpiresAt(result.expiresAt)
-      setFallbackCode(result.fallbackCode)
       setOtp('')
       setNow(Date.now())
     } catch {
@@ -376,11 +380,6 @@ export default function StudentRegisterModal({ open, onClose, t, dir, lang }) {
               <div className={`register-otp-timer ${remainingSec <= 30 ? 'is-urgent' : ''}`}>
                 {r.otpExpiresIn}: {mm}:{ss}
               </div>
-              {fallbackCode && (
-                <div className="register-otp-fallback" role="status">
-                  {r.otpFallback} <strong>{fallbackCode}</strong>
-                </div>
-              )}
               <label className="register-label">
                 {r.otpCode}
                 <input

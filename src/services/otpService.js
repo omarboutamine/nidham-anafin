@@ -5,6 +5,14 @@ function generateCode() {
   return String(Math.floor(100000 + Math.random() * 900000))
 }
 
+async function hashCode(code) {
+  const data = new TextEncoder().encode(String(code).trim())
+  const digest = await crypto.subtle.digest('SHA-256', data)
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+}
+
 export function getOtpTtlMs() {
   return OTP_TTL_MS
 }
@@ -31,27 +39,32 @@ export function readPendingOtp() {
 export async function createAndSendOtp({ email, profile, lang = 'ar' }) {
   const code = generateCode()
   const expiresAt = Date.now() + OTP_TTL_MS
-  const payload = {
-    email: email.trim().toLowerCase(),
-    code,
-    expiresAt,
-    profile,
-  }
-  sessionStorage.setItem(OTP_KEY, JSON.stringify(payload))
-
   const emailed = await sendOtpEmail(email, code, lang)
-  return {
-    expiresAt,
-    emailed,
-    /** Always returned so registration works even if mailbox delivery is delayed/blocked. */
-    fallbackCode: code,
+
+  if (!emailed) {
+    clearPendingOtp()
+    return { ok: false, expiresAt: 0 }
   }
+
+  const codeHash = await hashCode(code)
+  sessionStorage.setItem(
+    OTP_KEY,
+    JSON.stringify({
+      email: email.trim().toLowerCase(),
+      codeHash,
+      expiresAt,
+      profile,
+    }),
+  )
+
+  return { ok: true, expiresAt }
 }
 
-export function verifyOtp(inputCode) {
+export async function verifyOtp(inputCode) {
   const pending = readPendingOtp()
   if (!pending) return { ok: false, reason: 'EXPIRED' }
-  if (String(inputCode).trim() !== String(pending.code)) {
+  const inputHash = await hashCode(inputCode)
+  if (inputHash !== pending.codeHash) {
     return { ok: false, reason: 'INVALID' }
   }
   return { ok: true, profile: pending.profile, email: pending.email }
@@ -62,8 +75,8 @@ async function sendOtpEmail(email, code, lang) {
     lang === 'fr' ? 'Code de vérification — Nidham Anafin' : 'رمز التحقق — Nidham Anafin'
   const message =
     lang === 'fr'
-      ? `Votre code de vérification Nidham Anafin est : ${code}\nIl est valable 3 minutes.`
-      : `رمز التحقق الخاص بك في Nidham Anafin هو: ${code}\nصالح لمدة 3 دقائق فقط.`
+      ? `Votre code de vérification Nidham Anafin est : ${code}\nIl est valable 3 minutes.\nNe partagez ce code avec personne.`
+      : `رمز التحقق الخاص بك في Nidham Anafin هو: ${code}\nصالح لمدة 3 دقائق فقط.\nلا تشارك هذا الرمز مع أي شخص.`
 
   try {
     const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(email.trim())}`, {
@@ -77,7 +90,6 @@ async function sendOtpEmail(email, code, lang) {
         _template: 'box',
         _captcha: 'false',
         message,
-        code,
       }),
     })
     if (!res.ok) return false

@@ -1,4 +1,4 @@
-﻿/** SCF-style templates for manual pedagogical entry (not ledger-driven). */
+/** SCF-style templates for manual pedagogical entry (not ledger-driven). */
 
 export const BILAN_SECTIONS = {
   actifNonCourant: {

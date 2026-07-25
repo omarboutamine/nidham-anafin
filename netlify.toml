@@ -1,21 +1,11 @@
-# Netlify — frontend Nidham Anafin (Vite SPA) + OTP email function
+# Netlify — frontend Nidham Anafin (Vite SPA)
 
 [build]
   command = "npm run build"
   publish = "dist"
-  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "20"
-
-[functions]
-  node_bundler = "esbuild"
-
-# API first, then SPA fallback
-[[redirects]]
-  from = "/api/send-otp"
-  to = "/.netlify/functions/send-otp"
-  status = 200
 
 [[redirects]]
   from = "/*"

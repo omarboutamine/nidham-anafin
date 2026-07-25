@@ -202,6 +202,235 @@
   line-height: 1.55;
 }
 
+.register-modal--wide {
+  width: min(720px, 100%);
+}
+
+.register-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.register-steps {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.75rem 0 0;
+}
+
+.register-steps span {
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--text-muted);
+}
+
+.register-steps span.is-active {
+  border-color: rgba(212, 175, 55, 0.7);
+  background: rgba(212, 175, 55, 0.18);
+  color: var(--accent-gold);
+}
+
+.register-otp-mail {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+.register-otp-timer {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  background: rgba(212, 175, 55, 0.1);
+  color: var(--accent-gold);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.register-otp-timer.is-urgent {
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.12);
+  color: #fecaca;
+}
+
+.register-otp-fallback {
+  padding: 0.7rem 0.85rem;
+  border-radius: 8px;
+  border: 1px dashed rgba(212, 175, 55, 0.45);
+  background: rgba(212, 175, 55, 0.08);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.register-input--otp {
+  letter-spacing: 0.35em;
+  font-size: 1.25rem;
+  text-align: center;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.register-resend {
+  width: 100%;
+}
+
+.login-card--form {
+  text-align: start;
+  align-items: stretch;
+}
+
+.login-card--form .login-logo,
+.login-card--form .login-title,
+.login-card--form .login-soon {
+  text-align: center;
+  align-self: center;
+}
+
+.login-form {
+  width: 100%;
+}
+
+.login-back {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.login-back:hover {
+  color: var(--accent-gold);
+}
+
+.dash-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(212, 175, 55, 0.12), transparent 55%),
+    var(--bg-primary, #0b1220);
+  color: var(--text-primary);
+}
+
+.dash-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(17, 24, 39, 0.85);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.dash-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dash-user-chip {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: var(--accent-gold);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.dash-main {
+  width: min(960px, 100%);
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.dash-kicker {
+  margin: 0 0 0.35rem;
+  color: var(--accent-gold);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dash-title {
+  margin: 0;
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  font-weight: 800;
+}
+
+.dash-title span {
+  color: var(--accent-gold);
+}
+
+.dash-lead {
+  margin: 0.65rem 0 0;
+  color: var(--text-secondary);
+  max-width: 42rem;
+  line-height: 1.6;
+}
+
+.dash-panel {
+  padding: 1.25rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(17, 24, 39, 0.9);
+}
+
+.dash-panel--muted {
+  background: rgba(17, 24, 39, 0.55);
+}
+
+.dash-panel-title {
+  margin: 0 0 1rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.dash-profile-grid {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem 1.25rem;
+}
+
+.dash-profile-grid dt {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.dash-profile-grid dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.98rem;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.dash-workspace-empty {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+@media (max-width: 700px) {
+  .register-grid,
+  .dash-profile-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .login-page {
   min-height: 100vh;
   display: flex;

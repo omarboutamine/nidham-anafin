@@ -190,6 +190,7 @@ export default function Landing() {
         onClose={() => setRegisterOpen(false)}
         t={t}
         dir={dir}
+        lang={lang}
       />
     </div>
   )

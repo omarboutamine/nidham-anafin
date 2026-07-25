@@ -17,7 +17,7 @@ const content = {
     tickerAria: 'نقاط بارزة',
     ticker: [
       { label: 'الجمهور', value: 'طلبة وباحثون' },
-      { label: 'الولوج', value: 'بطاقة الطالب' },
+      { label: 'الولوج', value: 'البريد الجامعي' },
       { label: 'التحليل', value: 'نسب ومؤشرات' },
       { label: 'Nidham', value: 'Anafin' },
     ],
@@ -25,9 +25,9 @@ const content = {
     heroTitle: 'حلّل البيانات المالية',
     heroTitleAccent: 'بثقة أكاديمية',
     heroDesc:
-      'Nidham Anafin موجّه للطلبة والباحثين داخل المؤسسة الجامعية. إنشاء الحساب يتم عبر بطاقة الطالب لتأمين الولوج.',
+      'Nidham موجّه للطلبة والباحثين داخل المؤسسة الجامعية. إنشاء الحساب يتم عبر البريد الجامعي لتأمين الولوج.',
     heroLogin: 'تسجيل الدخول',
-    heroRegister: 'إنشاء حساب ببطاقة الطالب',
+    heroRegister: 'إنشاء حساب بالبريد الجامعي',
     servicesTitle: 'ماذا نقدّم؟',
     servicesDesc: `${SITE_BRAND.name} يساعد على فهم القوائم المالية وبناء تحليل منهجي لمذكرات التخرج والبحوث.`,
     services: [
@@ -45,16 +45,16 @@ const content = {
       },
       {
         title: 'ولوج محصور بالطلبة',
-        desc: 'التسجيل مرتبط ببطاقة الطالب لتقليل الحسابات من خارج الجامعة.',
+        desc: 'التسجيل مسموح فقط ببريد إلكتروني جامعي جزائري (.dz مؤسسي).',
       },
     ],
     aboutTitle: 'عن المنصة',
     aboutLead: `${SITE_BRAND.name} مشروع ضمن عائلة Nidham، مخصص للبيئة الجامعية: تحليل مالي تعليمي، آمن، وباللغتين العربية والفرنسية.`,
     aboutHighlights: [
       {
-        value: 'بطاقة',
+        value: 'بريد',
         label: 'التحقق الجامعي',
-        detail: 'رفع صورة بطاقة الطالب عند التسجيل كشرط أولي للولوج.',
+        detail: 'يشترط بريد المؤسسة الجامعية الجزائرية عند إنشاء الحساب.',
       },
       {
         value: 'SCF',
@@ -68,34 +68,32 @@ const content = {
       },
     ],
     ctaTitle: 'جاهز للانضمام؟',
-    ctaDesc: 'أنشئ حسابك الآن باستخدام بطاقة الطالب الخاصة بمؤسستك الجامعية.',
-    ctaButton: 'إنشاء حساب ببطاقة الطالب',
+    ctaDesc: 'أنشئ حسابك الآن باستخدام بريدك الجامعي الجزائري.',
+    ctaButton: 'إنشاء حساب بالبريد الجامعي',
     footerTagline: SITE_BRAND.taglineAr,
     footerRights: 'جميع الحقوق محفوظة.',
     register: {
-      title: 'إنشاء حساب طالب',
-      intro: 'أدخل بياناتك وارفع صورة واضحة لبطاقة الطالب. سيتم مراجعة الطلب لاحقاً.',
+      title: 'إنشاء حساب طالب / باحث',
+      intro:
+        'أدخل بياناتك وبريدك الجامعي الجزائري فقط (مثال: prenom.nom@etu.univ-….dz). Gmail وYahoo غير مقبولين.',
       fullName: 'الاسم الكامل',
       email: 'البريد الإلكتروني الجامعي',
+      emailPlaceholder: 'ex: 2525….@etu.univ-usto.dz',
       university: 'المؤسسة الجامعية',
-      studentId: 'رقم التسجيل / البطاقة',
       password: 'كلمة المرور',
-      cardLabel: 'صورة بطاقة الطالب',
-      cardHint: 'JPG أو PNG — يجب أن تظهر الهوية ورقم التسجيل بوضوح.',
-      chooseFile: 'اختيار ملف',
-      fileSelected: 'تم اختيار الملف',
       submit: 'إرسال طلب الحساب',
       submitting: 'جاري الإرسال…',
       success:
-        'تم استلام طلبك. بعد التحقق من بطاقة الطالب ستتمكن من الولوج (المرحلة القادمة من التطوير).',
+        'تم استلام طلبك. بعد التحقق من البريد الجامعي ستتمكن من الولوج (المرحلة القادمة من التطوير).',
       close: 'إغلاق',
       errors: {
-        required: 'جميع الحقول مطلوبة بما فيها صورة البطاقة.',
+        required: 'جميع الحقول مطلوبة.',
         email: 'أدخل بريداً إلكترونياً صالحاً.',
-        fileType: 'الملف يجب أن يكون صورة (JPG/PNG/WEBP).',
+        universityEmail:
+          'يجب استعمال بريد جامعي جزائري (مثل @etu.univ-….dz أو @univ-….dz). البريد الشخصي غير مقبول.',
       },
     },
-    loginSoon: 'صفحة الدخول قيد التهيئة — ابدأ بإنشاء حساب ببطاقة الطالب.',
+    loginSoon: 'صفحة الدخول قيد التهيئة — ابدأ بإنشاء حساب بالبريد الجامعي.',
   },
   fr: {
     langSwitchLabel: 'Choisir la langue',
@@ -110,7 +108,7 @@ const content = {
     tickerAria: 'Points clés',
     ticker: [
       { label: 'Public', value: 'Étudiants & chercheurs' },
-      { label: 'Accès', value: 'Carte étudiant' },
+      { label: 'Accès', value: 'E-mail universitaire' },
       { label: 'Analyse', value: 'Ratios & indicateurs' },
       { label: 'Nidham', value: 'Anafin' },
     ],
@@ -118,9 +116,9 @@ const content = {
     heroTitle: 'Analysez les données financières',
     heroTitleAccent: 'avec exigence académique',
     heroDesc:
-      'Nidham Anafin s’adresse aux étudiants et chercheurs de l’établissement universitaire. La création de compte passe par la carte étudiant pour sécuriser l’accès.',
+      'Nidham s’adresse aux étudiants et chercheurs de l’établissement universitaire. La création de compte se fait via l’e-mail universitaire pour sécuriser l’accès.',
     heroLogin: 'Connexion',
-    heroRegister: 'Créer un compte (carte étudiant)',
+    heroRegister: 'Créer un compte (e-mail universitaire)',
     servicesTitle: 'Que propose Anafin ?',
     servicesDesc: `${SITE_BRAND.name} aide à comprendre les états financiers et à construire une analyse structurée pour mémoires et recherches.`,
     services: [
@@ -138,16 +136,16 @@ const content = {
       },
       {
         title: 'Accès réservé aux étudiants',
-        desc: 'L’inscription est liée à la carte étudiant pour limiter les comptes hors campus.',
+        desc: 'Inscription limitée aux e-mails universitaires algériens (.dz institutionnels).',
       },
     ],
     aboutTitle: 'À propos',
     aboutLead: `${SITE_BRAND.name} fait partie de l’écosystème Nidham, dédié au contexte universitaire : analyse financière pédagogique, sécurisée, en arabe et en français.`,
     aboutHighlights: [
       {
-        value: 'Carte',
+        value: 'E-mail',
         label: 'Vérification universitaire',
-        detail: 'Dépôt d’une photo de la carte étudiant lors de l’inscription.',
+        detail: 'Un e-mail d’établissement algérien est requis pour créer un compte.',
       },
       {
         value: 'SCF',
@@ -161,35 +159,32 @@ const content = {
       },
     ],
     ctaTitle: 'Prêt à rejoindre Anafin ?',
-    ctaDesc: 'Créez votre compte avec la carte étudiant de votre établissement.',
-    ctaButton: 'Créer un compte (carte étudiant)',
+    ctaDesc: 'Créez votre compte avec votre e-mail universitaire algérien.',
+    ctaButton: 'Créer un compte (e-mail universitaire)',
     footerTagline: SITE_BRAND.taglineFr,
     footerRights: 'Tous droits réservés.',
     register: {
-      title: 'Créer un compte étudiant',
+      title: 'Créer un compte étudiant / chercheur',
       intro:
-        'Renseignez vos informations et déposez une photo lisible de votre carte étudiant. La validation sera finalisée ensuite.',
+        'Utilisez uniquement votre e-mail universitaire algérien (ex. prenom.nom@etu.univ-….dz). Gmail et Yahoo sont refusés.',
       fullName: 'Nom complet',
       email: 'E-mail universitaire',
+      emailPlaceholder: 'ex. 2525….@etu.univ-usto.dz',
       university: 'Établissement universitaire',
-      studentId: 'N° d’inscription / carte',
       password: 'Mot de passe',
-      cardLabel: 'Photo de la carte étudiant',
-      cardHint: 'JPG ou PNG — identité et numéro d’inscription visibles.',
-      chooseFile: 'Choisir un fichier',
-      fileSelected: 'Fichier sélectionné',
       submit: 'Envoyer la demande',
       submitting: 'Envoi…',
       success:
-        'Demande reçue. Après vérification de la carte étudiant, l’accès sera ouvert (prochaine étape de développement).',
+        'Demande reçue. Après vérification de l’e-mail universitaire, l’accès sera ouvert (prochaine étape).',
       close: 'Fermer',
       errors: {
-        required: 'Tous les champs sont requis, y compris la photo de la carte.',
+        required: 'Tous les champs sont requis.',
         email: 'Saisissez un e-mail valide.',
-        fileType: 'Le fichier doit être une image (JPG/PNG/WEBP).',
+        universityEmail:
+          'Utilisez un e-mail universitaire algérien (ex. @etu.univ-….dz ou @univ-….dz). Les e-mails personnels sont refusés.',
       },
     },
-    loginSoon: 'La page de connexion arrive bientôt — commencez par créer un compte carte étudiant.',
+    loginSoon: 'La page de connexion arrive bientôt — commencez par un compte e-mail universitaire.',
   },
 }
 

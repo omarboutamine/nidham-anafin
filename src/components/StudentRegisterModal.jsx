@@ -1,20 +1,14 @@
-import { useEffect, useId, useRef, useState } from 'react'
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg']
+import { useEffect, useId, useState } from 'react'
+import { isAlgerianUniversityEmail } from '../config/algerianUniversityEmails'
 
 export default function StudentRegisterModal({ open, onClose, t, dir }) {
   const titleId = useId()
-  const fileInputRef = useRef(null)
   const [form, setForm] = useState({
     fullName: '',
     email: '',
     university: '',
-    studentId: '',
     password: '',
   })
-  const [cardFile, setCardFile] = useState(null)
-  const [previewUrl, setPreviewUrl] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -28,75 +22,42 @@ export default function StudentRegisterModal({ open, onClose, t, dir }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [open, onClose])
 
-  useEffect(() => {
-    if (!cardFile) {
-      setPreviewUrl('')
-      return undefined
-    }
-    const url = URL.createObjectURL(cardFile)
-    setPreviewUrl(url)
-    return () => URL.revokeObjectURL(url)
-  }, [cardFile])
-
   if (!open) return null
 
   const r = t.register
-
   const update = (key) => (e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))
-
-  const onFileChange = (e) => {
-    const file = e.target.files?.[0]
-    setError('')
-    if (!file) {
-      setCardFile(null)
-      return
-    }
-    if (!IMAGE_TYPES.includes(file.type)) {
-      setError(r.errors.fileType)
-      setCardFile(null)
-      return
-    }
-    setCardFile(file)
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     setSuccess(false)
 
-    if (
-      !form.fullName.trim() ||
-      !form.email.trim() ||
-      !form.university.trim() ||
-      !form.studentId.trim() ||
-      !form.password.trim() ||
-      !cardFile
-    ) {
+    if (!form.fullName.trim() || !form.email.trim() || !form.university.trim() || !form.password.trim()) {
       setError(r.errors.required)
       return
     }
-    if (!EMAIL_RE.test(form.email.trim())) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
       setError(r.errors.email)
+      return
+    }
+    if (!isAlgerianUniversityEmail(form.email)) {
+      setError(r.errors.universityEmail)
       return
     }
 
     setLoading(true)
     try {
-      // Étape actuelle : UI + stockage local (backend plus tard)
       const payload = {
-        ...form,
+        fullName: form.fullName.trim(),
         email: form.email.trim().toLowerCase(),
-        cardFileName: cardFile.name,
-        cardSize: cardFile.size,
+        university: form.university.trim(),
         createdAt: new Date().toISOString(),
       }
       const prev = JSON.parse(localStorage.getItem('anafin_register_requests') || '[]')
       prev.push(payload)
       localStorage.setItem('anafin_register_requests', JSON.stringify(prev))
       setSuccess(true)
-      setForm({ fullName: '', email: '', university: '', studentId: '', password: '' })
-      setCardFile(null)
-      if (fileInputRef.current) fileInputRef.current.value = ''
+      setForm({ fullName: '', email: '', university: '', password: '' })
     } catch {
       setError(r.errors.required)
     } finally {
@@ -151,7 +112,9 @@ export default function StudentRegisterModal({ open, onClose, t, dir }) {
                   type="email"
                   value={form.email}
                   onChange={update('email')}
+                  placeholder={r.emailPlaceholder}
                   required
+                  autoComplete="email"
                 />
               </label>
               <label className="register-label">
@@ -160,15 +123,6 @@ export default function StudentRegisterModal({ open, onClose, t, dir }) {
                   className="register-input"
                   value={form.university}
                   onChange={update('university')}
-                  required
-                />
-              </label>
-              <label className="register-label">
-                {r.studentId}
-                <input
-                  className="register-input"
-                  value={form.studentId}
-                  onChange={update('studentId')}
                   required
                 />
               </label>
@@ -183,29 +137,6 @@ export default function StudentRegisterModal({ open, onClose, t, dir }) {
                   autoComplete="new-password"
                 />
               </label>
-
-              <div className="register-card-field">
-                <span className="register-label-text">{r.cardLabel}</span>
-                <p className="register-card-hint">{r.cardHint}</p>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="register-file-input"
-                  onChange={onFileChange}
-                />
-                <button
-                  type="button"
-                  className="btn btn-ghost"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  {cardFile ? r.fileSelected : r.chooseFile}
-                </button>
-                {cardFile && <span className="register-file-name">{cardFile.name}</span>}
-                {previewUrl && (
-                  <img src={previewUrl} alt="" className="register-card-preview" />
-                )}
-              </div>
 
               <button type="submit" className="btn btn-primary btn-lg register-submit" disabled={loading}>
                 {loading ? r.submitting : r.submit}

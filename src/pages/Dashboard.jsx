@@ -15,7 +15,7 @@ export default function Dashboard() {
 
   return (
     <DashShell user={user} showSidebar>
-      <section className="dash-empty-home">
+      <section className="dash-home-panel">
         <p className="dash-kicker">{d.kicker}</p>
         <h1 className="dash-title">
           {d.welcome} <span>{user.fullName}</span>

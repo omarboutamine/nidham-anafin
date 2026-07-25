@@ -118,16 +118,32 @@ export default function DashShell({ user, children, showSidebar = false, activeS
       <div className={`dash-body ${showSidebar ? 'dash-body--split' : ''}`}>
         {showSidebar && (
           <aside className="dash-sidebar" aria-label={d.sidebarAria}>
-            <p className="dash-sidebar__title">{d.sidebarTitle}</p>
-            <NavLink
-              to="/dashboard/analyse-structure"
-              className={({ isActive }) =>
-                `dash-sidebar__item ${isActive || activeSidebar === 'structure' ? 'is-active' : ''}`
-              }
-            >
-              <span className="dash-sidebar__item-label">{d.structureAnalysis}</span>
-              <span className="dash-sidebar__item-hint">{d.structureAnalysisHint}</span>
-            </NavLink>
+            <div className="dash-sidebar__head">
+              <span className="dash-sidebar__badge">{d.sidebarBadge}</span>
+              <p className="dash-sidebar__title">{d.sidebarTitle}</p>
+            </div>
+            <nav className="dash-sidebar__nav">
+              <NavLink
+                to="/dashboard/analyse-structure"
+                className={({ isActive }) =>
+                  `dash-sidebar__item ${isActive || activeSidebar === 'structure' ? 'is-active' : ''}`
+                }
+              >
+                <span className="dash-sidebar__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <path d="M4 19V5" />
+                    <path d="M4 19h16" />
+                    <path d="M8 16V10" />
+                    <path d="M12 16V7" />
+                    <path d="M16 16v-4" />
+                  </svg>
+                </span>
+                <span className="dash-sidebar__text">
+                  <span className="dash-sidebar__item-label">{d.structureAnalysis}</span>
+                  <span className="dash-sidebar__item-desc">{d.structureAnalysisDesc}</span>
+                </span>
+              </NavLink>
+            </nav>
           </aside>
         )}
         <main className="dash-main">{children}</main>

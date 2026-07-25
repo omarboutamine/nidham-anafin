@@ -13,6 +13,7 @@ export default function StructureAnalysis({ user, t, lang }) {
   const d = t.dashboard
   const a = t.analysis
   const [state, setState] = useState(() => loadFinancial(user.id))
+  const year = state.activeYear || state.exerciseLabel
 
   const metrics = useMemo(() => {
     const bySection = {}
@@ -32,18 +33,11 @@ export default function StructureAnalysis({ user, t, lang }) {
     const tresorerie = frng - bfr
 
     return {
-      year: state.activeYear || state.exerciseLabel,
       totalActif,
       totalPassif,
-      actifCourant,
-      actifNonCourant,
-      passifCourant,
-      passifNonCourant,
-      capitaux,
       shareCourant: pct(actifCourant, totalActif),
       shareNonCourant: pct(actifNonCourant, totalActif),
       shareEquity: pct(capitaux, totalPassif),
-      shareDebt: pct(passifCourant + passifNonCourant, totalPassif),
       liquidity: passifCourant ? actifCourant / passifCourant : null,
       frng,
       bfr,
@@ -92,19 +86,21 @@ export default function StructureAnalysis({ user, t, lang }) {
   ]
 
   return (
-    <section className="fin-panel">
-      <header className="fin-panel__head">
-        <div>
+    <section className="analysis-page">
+      <header className="analysis-page__head">
+        <div className="analysis-page__intro">
           <p className="fin-kicker">{a.kicker}</p>
-          <h1 className="fin-panel__title">{a.title}</h1>
-          <p className="fin-panel__lead">{a.lead}</p>
+          <h1 className="analysis-page__title">{a.title}</h1>
+          <p className="analysis-page__lead">{a.lead}</p>
         </div>
-        <YearToolbar
-          userId={user.id}
-          activeYear={state.activeYear || state.exerciseLabel}
-          onYearChange={(year) => setState(loadFinancial(user.id, year))}
-          t={t}
-        />
+        <div className="analysis-page__tools">
+          <YearToolbar
+            userId={user.id}
+            activeYear={year}
+            onYearChange={(nextYear) => setState(loadFinancial(user.id, nextYear))}
+            t={t}
+          />
+        </div>
       </header>
 
       {metrics.empty ? (
@@ -115,22 +111,22 @@ export default function StructureAnalysis({ user, t, lang }) {
           </Link>
         </div>
       ) : (
-        <>
+        <div className="analysis-stage">
           <div className="analysis-summary">
-            <div>
+            <article className="analysis-summary__card">
               <span>{a.totalActif}</span>
               <strong>{formatMoney(metrics.totalActif, lang)}</strong>
-            </div>
-            <div>
+            </article>
+            <article className="analysis-summary__card">
               <span>{a.totalPassif}</span>
               <strong>{formatMoney(metrics.totalPassif, lang)}</strong>
-            </div>
-            <div>
+            </article>
+            <article className="analysis-summary__card">
               <span>{a.treasuryNet}</span>
               <strong className={metrics.tresorerie >= 0 ? 'is-pos' : 'is-neg'}>
                 {formatMoney(metrics.tresorerie, lang)}
               </strong>
-            </div>
+            </article>
           </div>
 
           <div className="analysis-grid">
@@ -142,7 +138,7 @@ export default function StructureAnalysis({ user, t, lang }) {
               </article>
             ))}
           </div>
-        </>
+        </div>
       )}
     </section>
   )

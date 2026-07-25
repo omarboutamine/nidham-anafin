@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BILAN_SECTIONS, formatMoney, n } from '../config/financialTemplates'
+import { useLandingLang } from '../hooks/useLandingLang'
 import { loadFinancial } from '../services/financialStore'
 import YearToolbar from './YearToolbar'
 
@@ -9,7 +10,20 @@ function pct(part, total) {
   return (part / total) * 100
 }
 
-export default function StructureAnalysis({ user, t, lang }) {
+function Meter({ value, label }) {
+  const width = Math.max(0, Math.min(100, value))
+  return (
+    <div className="analysis-meter">
+      <div className="analysis-meter__track">
+        <div className="analysis-meter__fill" style={{ width: `${width}%` }} />
+      </div>
+      <span className="analysis-meter__label">{label}</span>
+    </div>
+  )
+}
+
+export default function StructureAnalysis({ user }) {
+  const { t, lang } = useLandingLang()
   const d = t.dashboard
   const a = t.analysis
   const [state, setState] = useState(() => loadFinancial(user.id))
@@ -35,9 +49,15 @@ export default function StructureAnalysis({ user, t, lang }) {
     return {
       totalActif,
       totalPassif,
+      actifCourant,
+      actifNonCourant,
+      passifCourant,
+      passifNonCourant,
+      capitaux,
       shareCourant: pct(actifCourant, totalActif),
       shareNonCourant: pct(actifNonCourant, totalActif),
       shareEquity: pct(capitaux, totalPassif),
+      shareDebt: pct(passifCourant + passifNonCourant, totalPassif),
       liquidity: passifCourant ? actifCourant / passifCourant : null,
       frng,
       bfr,
@@ -45,45 +65,6 @@ export default function StructureAnalysis({ user, t, lang }) {
       empty: totalActif === 0 && totalPassif === 0,
     }
   }, [state])
-
-  const cards = [
-    {
-      key: 'courant',
-      label: a.actifCourantShare,
-      value: `${metrics.shareCourant.toFixed(1)} %`,
-      hint: a.actifCourantHint,
-    },
-    {
-      key: 'nonCourant',
-      label: a.actifNonCourantShare,
-      value: `${metrics.shareNonCourant.toFixed(1)} %`,
-      hint: a.actifNonCourantHint,
-    },
-    {
-      key: 'equity',
-      label: a.equityShare,
-      value: `${metrics.shareEquity.toFixed(1)} %`,
-      hint: a.equityHint,
-    },
-    {
-      key: 'liquidity',
-      label: a.liquidity,
-      value: metrics.liquidity == null ? '—' : metrics.liquidity.toFixed(2),
-      hint: a.liquidityHint,
-    },
-    {
-      key: 'frng',
-      label: a.frng,
-      value: formatMoney(metrics.frng, lang),
-      hint: a.frngHint,
-    },
-    {
-      key: 'bfr',
-      label: a.bfr,
-      value: formatMoney(metrics.bfr, lang),
-      hint: a.bfrHint,
-    },
-  ]
 
   return (
     <section className="analysis-page">
@@ -112,16 +93,16 @@ export default function StructureAnalysis({ user, t, lang }) {
         </div>
       ) : (
         <div className="analysis-stage">
-          <div className="analysis-summary">
-            <article className="analysis-summary__card">
+          <div className="analysis-hero-strip">
+            <article className="analysis-kpi">
               <span>{a.totalActif}</span>
               <strong>{formatMoney(metrics.totalActif, lang)}</strong>
             </article>
-            <article className="analysis-summary__card">
+            <article className="analysis-kpi">
               <span>{a.totalPassif}</span>
               <strong>{formatMoney(metrics.totalPassif, lang)}</strong>
             </article>
-            <article className="analysis-summary__card">
+            <article className="analysis-kpi analysis-kpi--accent">
               <span>{a.treasuryNet}</span>
               <strong className={metrics.tresorerie >= 0 ? 'is-pos' : 'is-neg'}>
                 {formatMoney(metrics.tresorerie, lang)}
@@ -129,14 +110,46 @@ export default function StructureAnalysis({ user, t, lang }) {
             </article>
           </div>
 
-          <div className="analysis-grid">
-            {cards.map((card) => (
-              <article key={card.key} className="analysis-card">
-                <h3>{card.label}</h3>
-                <p className="analysis-card__value">{card.value}</p>
-                <p className="analysis-card__hint">{card.hint}</p>
-              </article>
-            ))}
+          <div className="analysis-structure">
+            <article className="analysis-structure__panel">
+              <h3>{a.actifStructure}</h3>
+              <Meter value={metrics.shareCourant} label={`${a.actifCourantShare}: ${metrics.shareCourant.toFixed(1)} %`} />
+              <Meter
+                value={metrics.shareNonCourant}
+                label={`${a.actifNonCourantShare}: ${metrics.shareNonCourant.toFixed(1)} %`}
+              />
+              <p className="analysis-structure__note">{a.actifStructureNote}</p>
+            </article>
+            <article className="analysis-structure__panel">
+              <h3>{a.passifStructure}</h3>
+              <Meter value={metrics.shareEquity} label={`${a.equityShare}: ${metrics.shareEquity.toFixed(1)} %`} />
+              <Meter value={metrics.shareDebt} label={`${a.debtShare}: ${metrics.shareDebt.toFixed(1)} %`} />
+              <p className="analysis-structure__note">{a.passifStructureNote}</p>
+            </article>
+          </div>
+
+          <div className="analysis-grid analysis-grid--three">
+            <article className="analysis-card">
+              <h3>{a.liquidity}</h3>
+              <p className="analysis-card__value">
+                {metrics.liquidity == null ? '—' : metrics.liquidity.toFixed(2)}
+              </p>
+              <p className="analysis-card__hint">{a.liquidityHint}</p>
+            </article>
+            <article className="analysis-card">
+              <h3>{a.frng}</h3>
+              <p className={`analysis-card__value ${metrics.frng >= 0 ? 'is-pos' : 'is-neg'}`}>
+                {formatMoney(metrics.frng, lang)}
+              </p>
+              <p className="analysis-card__hint">{a.frngHint}</p>
+            </article>
+            <article className="analysis-card">
+              <h3>{a.bfr}</h3>
+              <p className={`analysis-card__value ${metrics.bfr >= 0 ? 'is-pos' : 'is-neg'}`}>
+                {formatMoney(metrics.bfr, lang)}
+              </p>
+              <p className="analysis-card__hint">{a.bfrHint}</p>
+            </article>
           </div>
         </div>
       )}

@@ -36,10 +36,10 @@ export function readPendingOtp() {
   }
 }
 
-export async function createAndSendOtp({ email, profile, lang = 'ar' }) {
+export async function createAndSendOtp({ email, profile = null, lang = 'ar', purpose = 'register' }) {
   const code = generateCode()
   const expiresAt = Date.now() + OTP_TTL_MS
-  const emailed = await sendOtpEmail(email, code, lang)
+  const emailed = await sendOtpEmail(email, code, lang, purpose)
 
   if (!emailed) {
     clearPendingOtp()
@@ -54,29 +54,44 @@ export async function createAndSendOtp({ email, profile, lang = 'ar' }) {
       codeHash,
       expiresAt,
       profile,
+      purpose,
     }),
   )
 
   return { ok: true, expiresAt }
 }
 
-export async function verifyOtp(inputCode) {
+export async function verifyOtp(inputCode, expectedPurpose) {
   const pending = readPendingOtp()
   if (!pending) return { ok: false, reason: 'EXPIRED' }
+  if (expectedPurpose && pending.purpose !== expectedPurpose) {
+    return { ok: false, reason: 'INVALID' }
+  }
   const inputHash = await hashCode(inputCode)
   if (inputHash !== pending.codeHash) {
     return { ok: false, reason: 'INVALID' }
   }
-  return { ok: true, profile: pending.profile, email: pending.email }
+  return { ok: true, profile: pending.profile, email: pending.email, purpose: pending.purpose }
 }
 
-async function sendOtpEmail(email, code, lang) {
+async function sendOtpEmail(email, code, lang, purpose) {
+  const isReset = purpose === 'reset'
   const subject =
-    lang === 'fr' ? 'Code de vérification — Nidham Anafin' : 'رمز التحقق — Nidham Anafin'
+    lang === 'fr'
+      ? isReset
+        ? 'Réinitialisation du mot de passe — Nidham Anafin'
+        : 'Code de vérification — Nidham Anafin'
+      : isReset
+        ? 'إعادة تعيين كلمة المرور — Nidham Anafin'
+        : 'رمز التحقق — Nidham Anafin'
   const message =
     lang === 'fr'
-      ? `Votre code de vérification Nidham Anafin est : ${code}\nIl est valable 3 minutes.\nNe partagez ce code avec personne.`
-      : `رمز التحقق الخاص بك في Nidham Anafin هو: ${code}\nصالح لمدة 3 دقائق فقط.\nلا تشارك هذا الرمز مع أي شخص.`
+      ? isReset
+        ? `Votre code de réinitialisation Nidham Anafin est : ${code}\nIl est valable 3 minutes.\nNe partagez ce code avec personne.`
+        : `Votre code de vérification Nidham Anafin est : ${code}\nIl est valable 3 minutes.\nNe partagez ce code avec personne.`
+      : isReset
+        ? `رمز إعادة تعيين كلمة المرور في Nidham Anafin هو: ${code}\nصالح لمدة 3 دقائق فقط.\nلا تشارك هذا الرمز مع أي شخص.`
+        : `رمز التحقق الخاص بك في Nidham Anafin هو: ${code}\nصالح لمدة 3 دقائق فقط.\nلا تشارك هذا الرمز مع أي شخص.`
 
   try {
     const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(email.trim())}`, {

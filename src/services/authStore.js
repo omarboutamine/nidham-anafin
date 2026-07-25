@@ -1,6 +1,9 @@
 const USERS_KEY = 'anafin_users'
 const SESSION_KEY = 'anafin_session'
 
+/** Bootstrap superadmin mailbox (site owner). */
+export const SUPERADMIN_EMAIL = 'omar.boutamine@univ-constantine2.dz'
+
 function readUsers() {
   try {
     const raw = localStorage.getItem(USERS_KEY)
@@ -34,9 +37,27 @@ function makeId() {
   return `u_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`
 }
 
+function withDefaults(user) {
+  return {
+    ...user,
+    role: user.role || (user.email === SUPERADMIN_EMAIL ? 'superadmin' : 'user'),
+    active: user.active !== false,
+  }
+}
+
+function migrateUsers() {
+  const users = readUsers().map(withDefaults)
+  const changed = users.some((u, i) => {
+    const raw = readUsers()[i]
+    return raw?.role !== u.role || raw?.active !== u.active
+  })
+  if (changed || readUsers().length !== users.length) writeUsers(users)
+  return users
+}
+
 export function findUserByEmail(email) {
   const normalized = email.trim().toLowerCase()
-  return readUsers().find((u) => u.email === normalized) || null
+  return migrateUsers().find((u) => u.email === normalized) || null
 }
 
 export async function createUser({ profile, password }) {
@@ -47,16 +68,18 @@ export async function createUser({ profile, password }) {
 
   const salt = makeSalt()
   const passwordHash = await hashPassword(password, salt)
-  const user = {
+  const user = withDefaults({
     id: makeId(),
     ...profile,
     email,
     salt,
     passwordHash,
+    role: email === SUPERADMIN_EMAIL ? 'superadmin' : 'user',
+    active: true,
     createdAt: new Date().toISOString(),
-  }
+  })
 
-  const users = readUsers()
+  const users = migrateUsers()
   users.push(user)
   writeUsers(users)
 
@@ -68,6 +91,7 @@ export async function createUser({ profile, password }) {
 export async function loginWithPassword(email, password) {
   const user = findUserByEmail(email)
   if (!user) throw new Error('INVALID_CREDENTIALS')
+  if (user.active === false) throw new Error('ACCOUNT_DISABLED')
   const hash = await hashPassword(password, user.salt)
   if (hash !== user.passwordHash) throw new Error('INVALID_CREDENTIALS')
 
@@ -85,15 +109,50 @@ export function getSessionUser() {
     const raw = localStorage.getItem(SESSION_KEY)
     if (!raw) return null
     const session = JSON.parse(raw)
-    const users = readUsers()
+    const users = migrateUsers()
     const user = users.find((u) => u.id === session.userId)
-    return user ? sanitizeUser(user) : null
+    if (!user) return null
+    if (user.active === false) {
+      logout()
+      return null
+    }
+    return sanitizeUser(user)
   } catch {
     return null
   }
 }
 
+export function listUsers() {
+  return migrateUsers()
+    .map(sanitizeUser)
+    .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))
+}
+
+export function setUserActive(userId, active) {
+  const users = migrateUsers()
+  const idx = users.findIndex((u) => u.id === userId)
+  if (idx < 0) throw new Error('NOT_FOUND')
+  if (users[idx].role === 'superadmin' && !active) {
+    throw new Error('CANNOT_DISABLE_SUPERADMIN')
+  }
+  users[idx] = { ...users[idx], active: !!active }
+  writeUsers(users)
+  return sanitizeUser(users[idx])
+}
+
+export async function resetPasswordForEmail(email, newPassword) {
+  const users = migrateUsers()
+  const idx = users.findIndex((u) => u.email === email.trim().toLowerCase())
+  if (idx < 0) throw new Error('NOT_FOUND')
+  if (users[idx].active === false) throw new Error('ACCOUNT_DISABLED')
+  const salt = makeSalt()
+  const passwordHash = await hashPassword(newPassword, salt)
+  users[idx] = { ...users[idx], salt, passwordHash }
+  writeUsers(users)
+  return sanitizeUser(users[idx])
+}
+
 function sanitizeUser(user) {
-  const { passwordHash, salt, ...safe } = user
+  const { passwordHash, salt, ...safe } = withDefaults(user)
   return safe
 }

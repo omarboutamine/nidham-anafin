@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import {
   DEFAULT_LANDING_LANG,
   LANDING_LANG_KEY,
   getLandingContent,
 } from '../config/landingI18n'
+
+const LangContext = createContext(null)
 
 function readStoredLang() {
   try {
@@ -14,10 +16,10 @@ function readStoredLang() {
   }
 }
 
-export function useLandingLang() {
+export function LangProvider({ children }) {
   const [lang, setLangState] = useState(readStoredLang)
 
-  const setLang = (next) => {
+  const setLang = useCallback((next) => {
     const value = next === 'fr' ? 'fr' : DEFAULT_LANDING_LANG
     setLangState(value)
     try {
@@ -25,7 +27,7 @@ export function useLandingLang() {
     } catch {
       /* ignore */
     }
-  }
+  }, [])
 
   const t = useMemo(() => getLandingContent(lang), [lang])
   const dir = lang === 'ar' ? 'rtl' : 'ltr'
@@ -33,11 +35,17 @@ export function useLandingLang() {
   useEffect(() => {
     document.documentElement.lang = lang === 'ar' ? 'ar' : 'fr'
     document.documentElement.dir = dir
-    return () => {
-      document.documentElement.lang = 'ar'
-      document.documentElement.dir = 'rtl'
-    }
   }, [lang, dir])
 
-  return { lang, setLang, t, dir }
+  const value = useMemo(() => ({ lang, setLang, t, dir }), [lang, setLang, t, dir])
+
+  return <LangContext.Provider value={value}>{children}</LangContext.Provider>
+}
+
+export function useLandingLang() {
+  const ctx = useContext(LangContext)
+  if (!ctx) {
+    throw new Error('useLandingLang must be used within LangProvider')
+  }
+  return ctx
 }

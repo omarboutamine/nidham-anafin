@@ -101,6 +101,16 @@ export default function DashShell({ user, children, showSidebar = false, activeS
                 >
                   {d.personalData}
                 </Link>
+                {user.role === 'superadmin' && (
+                  <Link
+                    to="/dashboard/admin/users"
+                    role="menuitem"
+                    className="dash-user-dropdown__item"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {d.adminUsers}
+                  </Link>
+                )}
                 <button
                   type="button"
                   role="menuitem"

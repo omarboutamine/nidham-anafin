@@ -5,9 +5,10 @@ import { useLandingLang } from '../hooks/useLandingLang'
 import { getSessionUser, loginWithPassword } from '../services/authStore'
 import '../styles/landing-base.css'
 import '../styles/landing-extra.css'
+import '../styles/financial.css'
 
 export default function Login() {
-  const { t, dir } = useLandingLang()
+  const { t, dir, lang, setLang } = useLandingLang()
   const navigate = useNavigate()
   const existing = getSessionUser()
 
@@ -29,8 +30,9 @@ export default function Login() {
     try {
       await loginWithPassword(email, password)
       navigate('/dashboard', { replace: true })
-    } catch {
-      setError(t.login.errors.invalid)
+    } catch (err) {
+      if (err?.message === 'ACCOUNT_DISABLED') setError(t.login.errors.disabled)
+      else setError(t.login.errors.invalid)
     } finally {
       setLoading(false)
     }
@@ -43,9 +45,28 @@ export default function Login() {
       </div>
       <div className="login-container">
         <div className="login-card login-card--form">
-          <Link to="/" className="login-logo">
-            <SiteLogo />
-          </Link>
+          <div className="login-top-bar">
+            <Link to="/" className="login-logo">
+              <SiteLogo />
+            </Link>
+            <div className="landing-lang-switch" role="group" aria-label={t.langSwitchLabel}>
+              <button
+                type="button"
+                className={`landing-lang-btn ${lang === 'ar' ? 'active' : ''}`}
+                onClick={() => setLang('ar')}
+              >
+                العربية
+              </button>
+              <button
+                type="button"
+                className={`landing-lang-btn ${lang === 'fr' ? 'active' : ''}`}
+                onClick={() => setLang('fr')}
+              >
+                Français
+              </button>
+            </div>
+          </div>
+
           <h1 className="login-title">{t.nav.login}</h1>
           <p className="login-soon">{t.login.intro}</p>
 
@@ -77,6 +98,11 @@ export default function Login() {
                 required
               />
             </label>
+            <div className="login-forgot-row">
+              <Link to="/forgot-password" className="login-forgot">
+                {t.login.forgot}
+              </Link>
+            </div>
             <button type="submit" className="btn btn-primary btn-lg register-submit" disabled={loading}>
               {loading ? t.login.submitting : t.login.submit}
             </button>

@@ -1,7 +1,9 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminUsersPage from './pages/AdminUsersPage'
 import BilanPage from './pages/BilanPage'
 import Dashboard from './pages/Dashboard'
+import ForgotPassword from './pages/ForgotPassword'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Profile from './pages/Profile'
@@ -14,6 +16,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route
           path="/dashboard"
           element={
@@ -51,6 +54,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <StructureAnalysisPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/admin/users"
+          element={
+            <ProtectedRoute>
+              <AdminUsersPage />
             </ProtectedRoute>
           }
         />

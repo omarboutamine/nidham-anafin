@@ -3,11 +3,77 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 import SiteLogo from './SiteLogo'
 import { useLandingLang } from '../hooks/useLandingLang'
 import { logout } from '../services/authStore'
+import { ANALYSIS_MODULES } from '../services/analysisEngine'
+
+const ICONS = {
+  chart: (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M4 19V5" />
+      <path d="M4 19h16" />
+      <path d="M8 16V10" />
+      <path d="M12 16V7" />
+      <path d="M16 16v-4" />
+    </svg>
+  ),
+  pulse: (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M3 12h4l2-6 4 12 2-6h6" />
+    </svg>
+  ),
+  drop: (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M12 3s6 6.5 6 11a6 6 0 1 1-12 0c0-4.5 6-11 6-11z" />
+    </svg>
+  ),
+  shield: (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M12 3l8 3v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-3z" />
+    </svg>
+  ),
+  trend: (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M4 18l6-6 4 4 6-8" />
+      <path d="M14 8h6v6" />
+    </svg>
+  ),
+  cycle: (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M4 12a8 8 0 0 1 13.5-5.8" />
+      <path d="M20 12a8 8 0 0 1-13.5 5.8" />
+      <path d="M17 4v4h4" />
+      <path d="M7 20v-4H3" />
+    </svg>
+  ),
+  layers: (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M12 3l9 5-9 5-9-5 9-5z" />
+      <path d="M3 13l9 5 9-5" />
+      <path d="M3 17l9 5 9-5" />
+    </svg>
+  ),
+  score: (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="12" cy="12" r="8" />
+      <path d="M12 8v4l3 2" />
+    </svg>
+  ),
+  timeline: (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M4 6h16" />
+      <path d="M4 12h10" />
+      <path d="M4 18h13" />
+      <circle cx="18" cy="12" r="2" />
+      <circle cx="20" cy="18" r="2" />
+    </svg>
+  ),
+}
 
 export default function DashShell({ user, children, showSidebar = false, activeSidebar }) {
   const { t, dir, lang, setLang } = useLandingLang()
   const navigate = useNavigate()
   const d = t.dashboard
+  const navLabels = t.modules?.nav || {}
+  const navDescs = t.modules?.navDesc || {}
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef(null)
 
@@ -133,26 +199,27 @@ export default function DashShell({ user, children, showSidebar = false, activeS
               <p className="dash-sidebar__title">{d.sidebarTitle}</p>
             </div>
             <nav className="dash-sidebar__nav">
-              <NavLink
-                to="/dashboard/analyse-structure"
-                className={({ isActive }) =>
-                  `dash-sidebar__item ${isActive || activeSidebar === 'structure' ? 'is-active' : ''}`
-                }
-              >
-                <span className="dash-sidebar__icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
-                    <path d="M4 19V5" />
-                    <path d="M4 19h16" />
-                    <path d="M8 16V10" />
-                    <path d="M12 16V7" />
-                    <path d="M16 16v-4" />
-                  </svg>
-                </span>
-                <span className="dash-sidebar__text">
-                  <span className="dash-sidebar__item-label">{d.structureAnalysis}</span>
-                  <span className="dash-sidebar__item-desc">{d.structureAnalysisDesc}</span>
-                </span>
-              </NavLink>
+              {ANALYSIS_MODULES.map((mod) => (
+                <NavLink
+                  key={mod.id}
+                  to={mod.path}
+                  className={({ isActive }) =>
+                    `dash-sidebar__item ${isActive || activeSidebar === mod.id ? 'is-active' : ''}`
+                  }
+                >
+                  <span className="dash-sidebar__icon" aria-hidden="true">
+                    {ICONS[mod.icon] || ICONS.chart}
+                  </span>
+                  <span className="dash-sidebar__text">
+                    <span className="dash-sidebar__item-label">
+                      {navLabels[mod.id] || (mod.id === 'structure' ? d.structureAnalysis : mod.id)}
+                    </span>
+                    <span className="dash-sidebar__item-desc">
+                      {navDescs[mod.id] || (mod.id === 'structure' ? d.structureAnalysisDesc : '')}
+                    </span>
+                  </span>
+                </NavLink>
+              ))}
             </nav>
           </aside>
         )}

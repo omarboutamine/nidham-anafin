@@ -1,4 +1,5 @@
 import { SITE_BRAND } from './siteBrand'
+import { modulesAr, modulesFr } from './modulesI18n'
 
 export const LANDING_LANG_KEY = 'nidham-anafin-lang'
 export const DEFAULT_LANDING_LANG = 'ar'
@@ -194,6 +195,7 @@ const content = {
       bfrHint: 'أصول جارية − خصوم جارية.',
       yearFor: 'السنة',
     },
+    modules: modulesAr,
     admin: {
       kicker: 'إدارة',
       title: 'المستخدمون المسجّلون',
@@ -448,6 +450,7 @@ const content = {
       bfrHint: 'Actif courant − Passif courant.',
       yearFor: 'Exercice',
     },
+    modules: modulesFr,
     admin: {
       kicker: 'Administration',
       title: 'Utilisateurs inscrits',

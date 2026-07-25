@@ -7,6 +7,7 @@ import ForgotPassword from './pages/ForgotPassword'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Profile from './pages/Profile'
+import AnalysisModulePage from './pages/AnalysisModulePage'
 import StructureAnalysisPage from './pages/StructureAnalysisPage'
 import TcrPage from './pages/TcrPage'
 
@@ -54,6 +55,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <StructureAnalysisPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/analyse/:moduleSlug"
+          element={
+            <ProtectedRoute>
+              <AnalysisModulePage />
             </ProtectedRoute>
           }
         />

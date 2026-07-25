@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import SiteLogo from './SiteLogo'
 import { useLandingLang } from '../hooks/useLandingLang'
 import { logout } from '../services/authStore'
 
-export default function DashShell({ user, children, activeNav }) {
+export default function DashShell({ user, children, showSidebar = false, activeSidebar }) {
   const { t, dir, lang, setLang } = useLandingLang()
   const navigate = useNavigate()
   const d = t.dashboard
@@ -33,11 +33,31 @@ export default function DashShell({ user, children, activeNav }) {
   }
 
   return (
-    <div className="dash-page" dir={dir}>
+    <div className={`dash-page ${showSidebar ? 'dash-page--with-sidebar' : ''}`} dir={dir}>
       <header className="dash-header">
-        <Link to="/dashboard" className="dash-logo">
-          <SiteLogo />
-        </Link>
+        <div className="dash-header__start">
+          <Link to="/dashboard" className="dash-logo">
+            <SiteLogo />
+          </Link>
+          <nav className="dash-header-nav" aria-label={d.statementsNav}>
+            <NavLink to="/dashboard" end className={({ isActive }) => `dash-header-nav__link ${isActive ? 'is-active' : ''}`}>
+              {d.home}
+            </NavLink>
+            <NavLink
+              to="/dashboard/bilan"
+              className={({ isActive }) => `dash-header-nav__link ${isActive ? 'is-active' : ''}`}
+            >
+              {d.bilan}
+            </NavLink>
+            <NavLink
+              to="/dashboard/tcr"
+              className={({ isActive }) => `dash-header-nav__link ${isActive ? 'is-active' : ''}`}
+            >
+              {d.tcr}
+            </NavLink>
+          </nav>
+        </div>
+
         <div className="dash-header-actions">
           <div className="landing-lang-switch" role="group" aria-label={t.langSwitchLabel}>
             <button
@@ -95,30 +115,23 @@ export default function DashShell({ user, children, activeNav }) {
         </div>
       </header>
 
-      {activeNav != null && (
-        <nav className="dash-subnav" aria-label={d.statementsNav}>
-          <Link
-            to="/dashboard"
-            className={`dash-subnav__link ${activeNav === 'home' ? 'is-active' : ''}`}
-          >
-            {d.home}
-          </Link>
-          <Link
-            to="/dashboard/bilan"
-            className={`dash-subnav__link ${activeNav === 'bilan' ? 'is-active' : ''}`}
-          >
-            Bilan
-          </Link>
-          <Link
-            to="/dashboard/tcr"
-            className={`dash-subnav__link ${activeNav === 'tcr' ? 'is-active' : ''}`}
-          >
-            TCR
-          </Link>
-        </nav>
-      )}
-
-      <main className="dash-main">{children}</main>
+      <div className={`dash-body ${showSidebar ? 'dash-body--split' : ''}`}>
+        {showSidebar && (
+          <aside className="dash-sidebar" aria-label={d.sidebarAria}>
+            <p className="dash-sidebar__title">{d.sidebarTitle}</p>
+            <NavLink
+              to="/dashboard/analyse-structure"
+              className={({ isActive }) =>
+                `dash-sidebar__item ${isActive || activeSidebar === 'structure' ? 'is-active' : ''}`
+              }
+            >
+              <span className="dash-sidebar__item-label">{d.structureAnalysis}</span>
+              <span className="dash-sidebar__item-hint">{d.structureAnalysisHint}</span>
+            </NavLink>
+          </aside>
+        )}
+        <main className="dash-main">{children}</main>
+      </div>
     </div>
   )
 }

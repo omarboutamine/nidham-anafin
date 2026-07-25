@@ -13,7 +13,7 @@ export default function TcrPage() {
   if (!user) return <Navigate to="/login" replace />
 
   return (
-    <DashShell user={user} activeNav="tcr">
+    <DashShell user={user}>
       <TcrManual user={user} t={t} lang={lang} />
     </DashShell>
   )

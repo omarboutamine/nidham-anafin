@@ -19,7 +19,7 @@ export default function Profile() {
   if (!user) return <Navigate to="/login" replace />
 
   return (
-    <DashShell user={user} activeNav={null}>
+    <DashShell user={user}>
       <section className="dash-hero">
         <p className="dash-kicker">{d.personalData}</p>
         <h1 className="dash-title">{d.profileTitle}</h1>

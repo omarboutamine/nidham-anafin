@@ -5,6 +5,7 @@ import {
   n,
 } from '../config/financialTemplates'
 import { loadFinancial, saveFinancial } from '../services/financialStore'
+import YearToolbar from './YearToolbar'
 
 function sectionLabel(section, lang) {
   return lang === 'ar' ? section.ar : section.fr
@@ -19,8 +20,16 @@ export default function BilanManual({ user, t, lang }) {
   const [state, setState] = useState(() => loadFinancial(user.id))
   const [savedFlash, setSavedFlash] = useState(false)
 
-  const persist = (next) => {
-    const saved = saveFinancial(user.id, next)
+  const onYearChange = (year) => {
+    setState(loadFinancial(user.id, year))
+    setSavedFlash(false)
+  }
+
+  const persist = () => {
+    const saved = saveFinancial(user.id, {
+      exerciseLabel: state.activeYear || state.exerciseLabel,
+      bilanRows: state.bilanRows,
+    })
     setState(saved)
     setSavedFlash(true)
     window.setTimeout(() => setSavedFlash(false), 1600)
@@ -166,24 +175,13 @@ export default function BilanManual({ user, t, lang }) {
           <p className="fin-panel__lead">{f.bilanLead}</p>
         </div>
         <div className="fin-panel__tools">
-          <label className="fin-exercise">
-            {f.exercise}
-            <input
-              className="fin-input"
-              value={state.exerciseLabel}
-              onChange={(e) => setState((prev) => ({ ...prev, exerciseLabel: e.target.value }))}
-            />
-          </label>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() =>
-              persist({
-                exerciseLabel: state.exerciseLabel,
-                bilanRows: state.bilanRows,
-              })
-            }
-          >
+          <YearToolbar
+            userId={user.id}
+            activeYear={state.activeYear || state.exerciseLabel}
+            onYearChange={onYearChange}
+            t={t}
+          />
+          <button type="button" className="btn btn-primary" onClick={persist}>
             {f.save}
           </button>
           {savedFlash && <span className="fin-saved">{f.saved}</span>}

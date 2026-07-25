@@ -1,6 +1,7 @@
 import { Fragment, useMemo, useState } from 'react'
 import { computeTcr, formatMoney, TCR_INPUTS } from '../config/financialTemplates'
 import { loadFinancial, saveFinancial } from '../services/financialStore'
+import YearToolbar from './YearToolbar'
 
 function inputLabel(row, lang) {
   return lang === 'ar' ? row.labelAr : row.labelFr
@@ -10,6 +11,11 @@ export default function TcrManual({ user, t, lang }) {
   const f = t.financial
   const [state, setState] = useState(() => loadFinancial(user.id))
   const [savedFlash, setSavedFlash] = useState(false)
+
+  const onYearChange = (year) => {
+    setState(loadFinancial(user.id, year))
+    setSavedFlash(false)
+  }
 
   const computed = useMemo(() => computeTcr(state.tcrAmounts), [state.tcrAmounts])
 
@@ -21,10 +27,11 @@ export default function TcrManual({ user, t, lang }) {
   }
 
   const persist = () => {
-    saveFinancial(user.id, {
-      exerciseLabel: state.exerciseLabel,
+    const saved = saveFinancial(user.id, {
+      exerciseLabel: state.activeYear || state.exerciseLabel,
       tcrAmounts: state.tcrAmounts,
     })
+    setState(saved)
     setSavedFlash(true)
     window.setTimeout(() => setSavedFlash(false), 1600)
   }
@@ -93,14 +100,12 @@ export default function TcrManual({ user, t, lang }) {
           <p className="fin-panel__lead">{f.tcrLead}</p>
         </div>
         <div className="fin-panel__tools">
-          <label className="fin-exercise">
-            {f.exercise}
-            <input
-              className="fin-input"
-              value={state.exerciseLabel}
-              onChange={(e) => setState((prev) => ({ ...prev, exerciseLabel: e.target.value }))}
-            />
-          </label>
+          <YearToolbar
+            userId={user.id}
+            activeYear={state.activeYear || state.exerciseLabel}
+            onYearChange={onYearChange}
+            t={t}
+          />
           <button type="button" className="btn btn-primary" onClick={persist}>
             {f.save}
           </button>

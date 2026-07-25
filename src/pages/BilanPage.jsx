@@ -13,7 +13,7 @@ export default function BilanPage() {
   if (!user) return <Navigate to="/login" replace />
 
   return (
-    <DashShell user={user} activeNav="bilan">
+    <DashShell user={user}>
       <BilanManual user={user} t={t} lang={lang} />
     </DashShell>
   )

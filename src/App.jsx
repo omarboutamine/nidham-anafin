@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Profile from './pages/Profile'
+import StructureAnalysisPage from './pages/StructureAnalysisPage'
 import TcrPage from './pages/TcrPage'
 
 export default function App() {
@@ -42,6 +43,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <TcrPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/analyse-structure"
+          element={
+            <ProtectedRoute>
+              <StructureAnalysisPage />
             </ProtectedRoute>
           }
         />

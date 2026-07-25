@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
 import BilanPage from './pages/BilanPage'
 import Dashboard from './pages/Dashboard'
@@ -45,6 +45,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/dashboard/scf" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   )

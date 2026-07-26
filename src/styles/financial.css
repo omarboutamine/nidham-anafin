@@ -1772,8 +1772,9 @@
 }
 
 .company-card__nav .btn {
-  min-width: 4.5rem;
+  min-width: auto;
   justify-content: center;
+  white-space: nowrap;
 }
 
 .company-card__delete {

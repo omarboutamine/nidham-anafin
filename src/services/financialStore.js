@@ -31,6 +31,30 @@ function blankYearData() {
   }
 }
 
+/** Copy structure from a source year, clearing all amounts. */
+function yearDataFromPrevious(source) {
+  if (!source) return blankYearData()
+  const bilanRows =
+    Array.isArray(source.bilanRows) && source.bilanRows.length
+      ? source.bilanRows.map((row) => ({ ...row, amount: '' }))
+      : blankYearData().bilanRows
+  return {
+    bilanRows,
+    tcrAmounts: emptyTcrAmounts(),
+    updatedAt: null,
+  }
+}
+
+function pickTemplateYear(store, excludeYear) {
+  if (store.activeYear && store.activeYear !== excludeYear && store.years[store.activeYear]) {
+    return store.years[store.activeYear]
+  }
+  const keys = Object.keys(store.years)
+    .filter((y) => y !== excludeYear)
+    .sort((a, b) => Number(b) - Number(a) || String(b).localeCompare(String(a)))
+  return keys.length ? store.years[keys[0]] : null
+}
+
 function currentYear() {
   return String(new Date().getFullYear())
 }
@@ -93,7 +117,7 @@ export function setActiveYear(userId, year, companyId) {
   const store = normalizeStore(readRaw(userId, companyId))
   const y = String(year).trim()
   if (!y) return store
-  if (!store.years[y]) store.years[y] = blankYearData()
+  if (!store.years[y]) store.years[y] = yearDataFromPrevious(pickTemplateYear(store, y))
   store.activeYear = y
   writeRaw(userId, store, companyId)
   return store
@@ -104,7 +128,7 @@ export function addYear(userId, year, companyId) {
   const y = String(year).trim()
   if (!/^\d{4}$/.test(y)) throw new Error('INVALID_YEAR')
   const store = normalizeStore(readRaw(userId, companyId))
-  if (!store.years[y]) store.years[y] = blankYearData()
+  if (!store.years[y]) store.years[y] = yearDataFromPrevious(pickTemplateYear(store, y))
   store.activeYear = y
   writeRaw(userId, store, companyId)
   return store

@@ -76,12 +76,9 @@ export default function DashboardCompanies({ user, t, lang }) {
     <section className="dash-home-panel company-home">
       <p className="dash-kicker">{c.kicker}</p>
       <h1 className="dash-title">{c.title}</h1>
-      <p className="dash-lead">{c.lead}</p>
 
       {companies.length > 0 && (
         <div className="company-list-block">
-          <h2 className="company-block-title">{c.listTitle}</h2>
-          <p className="company-block-hint">{c.listHint}</p>
           <ul className="company-list">
             {companies.map((co) => {
               const isActive = co.id === activeId

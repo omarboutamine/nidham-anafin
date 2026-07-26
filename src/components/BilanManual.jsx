@@ -92,9 +92,6 @@ export default function BilanManual({ user, t, lang }) {
             <div key={sec.key} className="fin-section">
               <div className="fin-section__head">
                 <h4>{sectionLabel(sec, lang)}</h4>
-                <button type="button" className="fin-add-btn" onClick={() => addRow(sec.key)}>
-                  + {f.addLine}
-                </button>
               </div>
               <table className="fin-table">
                 <thead>
@@ -145,6 +142,13 @@ export default function BilanManual({ user, t, lang }) {
                       </td>
                     </tr>
                   ))}
+                  <tr className="fin-row-add">
+                    <td colSpan={4}>
+                      <button type="button" className="fin-add-btn" onClick={() => addRow(sec.key)}>
+                        + {f.addLine}
+                      </button>
+                    </td>
+                  </tr>
                   <tr className="fin-row-subtotal">
                     <td colSpan={2}>
                       {f.subtotal} {sectionLabel(sec, lang)}

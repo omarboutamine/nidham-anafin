@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { addYear, listYears, removeYear, setActiveYear } from '../services/financialStore'
 
-export default function YearToolbar({ userId, activeYear, onYearChange, t }) {
+export default function YearToolbar({ userId, activeYear, onYearChange, t, getYearTemplate }) {
   const f = t.financial
   const [years, setYears] = useState(() => listYears(userId))
   const [draft, setDraft] = useState('')
@@ -21,9 +21,10 @@ export default function YearToolbar({ userId, activeYear, onYearChange, t }) {
   const handleAdd = (e) => {
     e.preventDefault()
     setError('')
+    const y = draft.trim()
     try {
-      addYear(userId, draft.trim())
-      const y = draft.trim()
+      const sourceData = typeof getYearTemplate === 'function' ? getYearTemplate() : null
+      addYear(userId, y, undefined, sourceData || undefined)
       setDraft('')
       refresh(y)
     } catch {

@@ -55,6 +55,23 @@ function pickTemplateYear(store, excludeYear) {
   return keys.length ? store.years[keys[0]] : null
 }
 
+function isYearAmountsEmpty(data) {
+  if (!data) return true
+  const rows = Array.isArray(data.bilanRows) ? data.bilanRows : []
+  const hasBilan = rows.some((r) => {
+    const raw = String(r?.amount ?? '')
+      .trim()
+      .replace(/\s/g, '')
+      .replace(',', '.')
+    if (!raw) return false
+    const num = Number(raw)
+    return !Number.isNaN(num) && num !== 0
+  })
+  const tcr = data.tcrAmounts || {}
+  const hasTcr = Object.values(tcr).some((v) => String(v ?? '').trim() !== '')
+  return !hasBilan && !hasTcr
+}
+
 function currentYear() {
   return String(new Date().getFullYear())
 }
@@ -123,12 +140,17 @@ export function setActiveYear(userId, year, companyId) {
   return store
 }
 
-export function addYear(userId, year, companyId) {
+export function addYear(userId, year, companyId, sourceData) {
   requireCompany(userId, companyId)
   const y = String(year).trim()
   if (!/^\d{4}$/.test(y)) throw new Error('INVALID_YEAR')
   const store = normalizeStore(readRaw(userId, companyId))
-  if (!store.years[y]) store.years[y] = yearDataFromPrevious(pickTemplateYear(store, y))
+  const template = sourceData || pickTemplateYear(store, y)
+  const existing = store.years[y]
+  // Create new year, or re-seed an empty year that was created with defaults earlier.
+  if (!existing || isYearAmountsEmpty(existing)) {
+    store.years[y] = yearDataFromPrevious(template)
+  }
   store.activeYear = y
   writeRaw(userId, store, companyId)
   return store

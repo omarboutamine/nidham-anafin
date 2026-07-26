@@ -37,6 +37,21 @@ export default function TcrManual({ user, t, lang }) {
     window.setTimeout(() => setSavedFlash(false), 1600)
   }
 
+  const getYearTemplate = () => {
+    const saved = saveFinancial(user.id, {
+      exerciseLabel: state.activeYear || state.exerciseLabel,
+      bilanRows: state.bilanRows,
+      tcrAmounts: state.tcrAmounts,
+    })
+    setState((prev) => ({
+      ...prev,
+      bilanRows: saved.bilanRows,
+      tcrAmounts: saved.tcrAmounts,
+      updatedAt: saved.updatedAt,
+    }))
+    return { bilanRows: saved.bilanRows, tcrAmounts: saved.tcrAmounts }
+  }
+
   const lines = [
     {
       id: '1',
@@ -110,6 +125,7 @@ export default function TcrManual({ user, t, lang }) {
             activeYear={state.activeYear || state.exerciseLabel}
             onYearChange={onYearChange}
             t={t}
+            getYearTemplate={getYearTemplate}
           />
           <button type="button" className="btn btn-primary" onClick={persist}>
             {f.save}

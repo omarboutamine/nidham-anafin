@@ -36,6 +36,21 @@ export default function BilanManual({ user, t, lang }) {
     window.setTimeout(() => setSavedFlash(false), 1600)
   }
 
+  const getYearTemplate = () => {
+    const saved = saveFinancial(user.id, {
+      exerciseLabel: state.activeYear || state.exerciseLabel,
+      bilanRows: state.bilanRows,
+      tcrAmounts: state.tcrAmounts,
+    })
+    setState((prev) => ({
+      ...prev,
+      bilanRows: saved.bilanRows,
+      tcrAmounts: saved.tcrAmounts,
+      updatedAt: saved.updatedAt,
+    }))
+    return { bilanRows: saved.bilanRows, tcrAmounts: saved.tcrAmounts }
+  }
+
   const updateRow = (id, patch) => {
     const bilanRows = state.bilanRows.map((r) => (r.id === id ? { ...r, ...patch } : r))
     setState((prev) => ({ ...prev, bilanRows }))
@@ -189,6 +204,7 @@ export default function BilanManual({ user, t, lang }) {
             activeYear={state.activeYear || state.exerciseLabel}
             onYearChange={onYearChange}
             t={t}
+            getYearTemplate={getYearTemplate}
           />
           <button type="button" className="btn btn-primary" onClick={persist}>
             {f.save}

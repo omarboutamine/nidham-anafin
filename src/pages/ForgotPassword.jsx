@@ -67,7 +67,11 @@ export default function ForgotPassword() {
         purpose: 'reset',
       })
       if (!result.ok) {
-        setError(t.register.errors.sendFailed)
+        setError(
+          result.reason === 'ACTIVATION_REQUIRED'
+            ? t.register.errors.activationRequired
+            : t.register.errors.sendFailed,
+        )
         return
       }
       setExpiresAt(result.expiresAt)

@@ -80,6 +80,7 @@ const content = {
       birthDate: 'تاريخ الازدياد',
       birthPlace: 'مكان الميلاد',
       registrationNumber: 'رقم التسجيل الجامعي',
+      registrationNumberOptional: 'اختياري',
       profession: 'المهنة',
       professionPlaceholder: 'إختر',
       professionStudent: 'طالب جامعي',
@@ -115,6 +116,8 @@ const content = {
         academicYear: 'اختر السنة الجامعية.',
         emailExists: 'يوجد حساب بهذا البريد مسبقاً. سجّل الدخول بدلاً من ذلك.',
         sendFailed: 'تعذّر إرسال رمز التحقق. حاول مجدداً.',
+        activationRequired:
+          'هذا البريد يحتاج تفعيل FormSubmit لأول مرة: افتح بريدك (وربما غير المرغوب فيه)، اضغط Activate Form، ثم اضغط «إعادة إرسال الرمز».',
         otpInvalid: 'الرمز غير صحيح.',
         otpExpired: 'انتهت صلاحية الرمز. أعد الإرسال.',
         passwordShort: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.',
@@ -333,6 +336,7 @@ const content = {
       birthDate: 'Date de naissance',
       birthPlace: 'Lieu de naissance',
       registrationNumber: "Numéro d'inscription universitaire",
+      registrationNumberOptional: 'Facultatif',
       profession: 'Profession',
       professionPlaceholder: 'Choisir',
       professionStudent: 'Étudiant universitaire',
@@ -368,6 +372,8 @@ const content = {
         academicYear: "Choisissez l'année universitaire.",
         emailExists: 'Un compte existe déjà avec cet e-mail. Connectez-vous.',
         sendFailed: "Impossible d'envoyer le code. Réessayez.",
+        activationRequired:
+          'Ce courriel doit activer FormSubmit une première fois : ouvrez votre boîte (et les spams), cliquez Activate Form, puis « Renvoyer le code ».',
         otpInvalid: 'Code incorrect.',
         otpExpired: 'Code expiré. Renvoyez-en un nouveau.',
         passwordShort: 'Le mot de passe doit contenir au moins 6 caractères.',

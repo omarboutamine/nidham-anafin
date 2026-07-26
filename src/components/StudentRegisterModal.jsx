@@ -101,15 +101,7 @@ export default function StudentRegisterModal({ open, onClose, t, dir, lang }) {
   }
 
   const validateForm = () => {
-    const required = [
-      form.fullName,
-      form.birthDate,
-      form.birthPlace,
-      form.registrationNumber,
-      form.profession,
-      form.email,
-      form.phone,
-    ]
+    const required = [form.fullName, form.birthDate, form.birthPlace, form.profession, form.email, form.phone]
     if (required.some((v) => !String(v).trim())) return r.errors.required
     if (form.profession === PROFESSION_VALUES.STUDENT && !form.academicYear) {
       return r.errors.academicYear
@@ -144,7 +136,7 @@ export default function StudentRegisterModal({ open, onClose, t, dir, lang }) {
       }
       const result = await createAndSendOtp({ email: profile.email, profile, lang })
       if (!result.ok) {
-        setError(r.errors.sendFailed)
+        setError(result.reason === 'ACTIVATION_REQUIRED' ? r.errors.activationRequired : r.errors.sendFailed)
         return
       }
       setExpiresAt(result.expiresAt)
@@ -189,7 +181,7 @@ export default function StudentRegisterModal({ open, onClose, t, dir, lang }) {
       }
       const result = await createAndSendOtp({ email: profile.email, profile, lang })
       if (!result.ok) {
-        setError(r.errors.sendFailed)
+        setError(result.reason === 'ACTIVATION_REQUIRED' ? r.errors.activationRequired : r.errors.sendFailed)
         return
       }
       setExpiresAt(result.expiresAt)
@@ -313,7 +305,8 @@ export default function StudentRegisterModal({ open, onClose, t, dir, lang }) {
                     className="register-input"
                     value={form.registrationNumber}
                     onChange={update('registrationNumber')}
-                    required
+                    placeholder={r.registrationNumberOptional}
+                    autoComplete="off"
                   />
                 </label>
                 <label className="register-label">

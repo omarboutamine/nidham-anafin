@@ -36,17 +36,13 @@ export function readPendingOtp() {
   }
 }
 
-export async function createAndSendOtp({ email, profile = null, lang = 'ar', purpose = 'register' }) {
-  const code = generateCode()
-  const expiresAt = Date.now() + OTP_TTL_MS
-  const emailed = await sendOtpEmail(email, code, lang, purpose)
+function otpApiUrl() {
+  const configured = import.meta.env.VITE_OTP_API_URL
+  if (configured) return configured
+  return '/api/send-otp'
+}
 
-  if (!emailed) {
-    clearPendingOtp()
-    return { ok: false, expiresAt: 0 }
-  }
-
-  const codeHash = await hashCode(code)
+function storePending({ email, codeHash, expiresAt, profile, purpose }) {
   sessionStorage.setItem(
     OTP_KEY,
     JSON.stringify({
@@ -57,24 +53,18 @@ export async function createAndSendOtp({ email, profile = null, lang = 'ar', pur
       purpose,
     }),
   )
-
-  return { ok: true, expiresAt }
 }
 
-export async function verifyOtp(inputCode, expectedPurpose) {
-  const pending = readPendingOtp()
-  if (!pending) return { ok: false, reason: 'EXPIRED' }
-  if (expectedPurpose && pending.purpose !== expectedPurpose) {
-    return { ok: false, reason: 'INVALID' }
+function classifyFormSubmitFailure(data, status) {
+  const msg = String(data?.message || data?.error || '')
+  if (/activat|confirm your email|confirmation link|initialize/i.test(msg)) {
+    return 'ACTIVATION_REQUIRED'
   }
-  const inputHash = await hashCode(inputCode)
-  if (inputHash !== pending.codeHash) {
-    return { ok: false, reason: 'INVALID' }
-  }
-  return { ok: true, profile: pending.profile, email: pending.email, purpose: pending.purpose }
+  if (status === 409) return 'ACTIVATION_REQUIRED'
+  return 'SEND_FAILED'
 }
 
-async function sendOtpEmail(email, code, lang, purpose) {
+async function sendOtpViaFormSubmit(email, code, lang, purpose) {
   const isReset = purpose === 'reset'
   const subject =
     lang === 'fr'
@@ -93,24 +83,104 @@ async function sendOtpEmail(email, code, lang, purpose) {
         ? `رمز إعادة تعيين كلمة المرور في Nidham Anafin هو: ${code}\nصالح لمدة 3 دقائق فقط.\nلا تشارك هذا الرمز مع أي شخص.`
         : `رمز التحقق الخاص بك في Nidham Anafin هو: ${code}\nصالح لمدة 3 دقائق فقط.\nلا تشارك هذا الرمز مع أي شخص.`
 
-  try {
-    const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(email.trim())}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({
-        _subject: subject,
-        _template: 'box',
-        _captcha: 'false',
-        message,
-      }),
-    })
-    if (!res.ok) return false
-    const data = await res.json().catch(() => ({}))
-    return data.success !== 'false' && data.success !== false
-  } catch {
-    return false
+  const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(email.trim())}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({
+      name: 'Nidham Anafin',
+      email: email.trim(),
+      _subject: subject,
+      _template: 'box',
+      _captcha: 'false',
+      message,
+    }),
+  })
+
+  const data = await res.json().catch(() => ({}))
+  const success = data.success === true || data.success === 'true'
+  if (res.ok && success) return { ok: true }
+  return { ok: false, reason: classifyFormSubmitFailure(data, res.status), message: data.message }
+}
+
+async function sendOtpViaApi({ email, lang, purpose }) {
+  const res = await fetch(otpApiUrl(), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({
+      email: email.trim().toLowerCase(),
+      lang,
+      purpose,
+    }),
+  })
+
+  const data = await res.json().catch(() => ({}))
+  if (res.ok && data.ok && data.codeHash && data.expiresAt) {
+    return {
+      ok: true,
+      expiresAt: data.expiresAt,
+      codeHash: data.codeHash,
+    }
   }
+
+  return {
+    ok: false,
+    reason: data.error === 'ACTIVATION_REQUIRED' ? 'ACTIVATION_REQUIRED' : 'SEND_FAILED',
+    message: data.message,
+  }
+}
+
+export async function createAndSendOtp({ email, profile = null, lang = 'ar', purpose = 'register' }) {
+  clearPendingOtp()
+  const normalizedEmail = email.trim().toLowerCase()
+
+  // Prefer Netlify function (SMTP if configured, else FormSubmit server-side).
+  try {
+    const apiResult = await sendOtpViaApi({ email: normalizedEmail, lang, purpose })
+    if (apiResult.ok) {
+      storePending({
+        email: normalizedEmail,
+        codeHash: apiResult.codeHash,
+        expiresAt: apiResult.expiresAt,
+        profile,
+        purpose,
+      })
+      return { ok: true, expiresAt: apiResult.expiresAt }
+    }
+    // On local Vite without Netlify functions, fall through to client FormSubmit.
+    if (apiResult.reason === 'ACTIVATION_REQUIRED') {
+      return { ok: false, expiresAt: 0, reason: 'ACTIVATION_REQUIRED' }
+    }
+  } catch {
+    // fall through
+  }
+
+  try {
+    const code = generateCode()
+    const expiresAt = Date.now() + OTP_TTL_MS
+    const emailed = await sendOtpViaFormSubmit(normalizedEmail, code, lang, purpose)
+    if (!emailed.ok) {
+      return { ok: false, expiresAt: 0, reason: emailed.reason || 'SEND_FAILED' }
+    }
+    const codeHash = await hashCode(code)
+    storePending({ email: normalizedEmail, codeHash, expiresAt, profile, purpose })
+    return { ok: true, expiresAt }
+  } catch {
+    return { ok: false, expiresAt: 0, reason: 'SEND_FAILED' }
+  }
+}
+
+export async function verifyOtp(inputCode, expectedPurpose) {
+  const pending = readPendingOtp()
+  if (!pending) return { ok: false, reason: 'EXPIRED' }
+  if (expectedPurpose && pending.purpose !== expectedPurpose) {
+    return { ok: false, reason: 'INVALID' }
+  }
+  const inputHash = await hashCode(inputCode)
+  if (inputHash !== pending.codeHash) {
+    return { ok: false, reason: 'INVALID' }
+  }
+  return { ok: true, profile: pending.profile, email: pending.email, purpose: pending.purpose }
 }

@@ -73,7 +73,6 @@ export default function DashShell({ user, children, showSidebar = false, activeS
   const navigate = useNavigate()
   const d = t.dashboard
   const navLabels = t.modules?.nav || {}
-  const navDescs = t.modules?.navDesc || {}
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef(null)
 
@@ -194,10 +193,6 @@ export default function DashShell({ user, children, showSidebar = false, activeS
       <div className={`dash-body ${showSidebar ? 'dash-body--split' : ''}`}>
         {showSidebar && (
           <aside className="dash-sidebar" aria-label={d.sidebarAria}>
-            <div className="dash-sidebar__head">
-              <span className="dash-sidebar__badge">{d.sidebarBadge}</span>
-              <p className="dash-sidebar__title">{d.sidebarTitle}</p>
-            </div>
             <nav className="dash-sidebar__nav">
               {ANALYSIS_MODULES.map((mod) => (
                 <NavLink
@@ -213,9 +208,6 @@ export default function DashShell({ user, children, showSidebar = false, activeS
                   <span className="dash-sidebar__text">
                     <span className="dash-sidebar__item-label">
                       {navLabels[mod.id] || (mod.id === 'structure' ? d.structureAnalysis : mod.id)}
-                    </span>
-                    <span className="dash-sidebar__item-desc">
-                      {navDescs[mod.id] || (mod.id === 'structure' ? d.structureAnalysisDesc : '')}
                     </span>
                   </span>
                 </NavLink>

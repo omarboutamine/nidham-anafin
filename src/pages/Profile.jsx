@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import DashShell from '../components/DashShell'
 import {
@@ -7,6 +8,7 @@ import {
 } from '../config/registerOptions'
 import { useLandingLang } from '../hooks/useLandingLang'
 import { getSessionUser } from '../services/authStore'
+import { downloadAnafinBackup, importAnafinBackup } from '../services/dataBackup'
 import '../styles/landing-base.css'
 import '../styles/landing-extra.css'
 import '../styles/financial.css'
@@ -15,8 +17,38 @@ export default function Profile() {
   const { t, lang } = useLandingLang()
   const user = getSessionUser()
   const d = t.dashboard
+  const b = t.backup
+  const fileRef = useRef(null)
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
 
   if (!user) return <Navigate to="/login" replace />
+
+  const handleExport = () => {
+    setError('')
+    downloadAnafinBackup()
+    setMessage(b.exported)
+  }
+
+  const handleImportClick = () => fileRef.current?.click()
+
+  const handleImportFile = async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setError('')
+    setMessage('')
+    try {
+      const text = await file.text()
+      importAnafinBackup(text)
+      setMessage(b.imported)
+      window.setTimeout(() => {
+        window.location.assign('/dashboard')
+      }, 700)
+    } catch {
+      setError(b.importFailed)
+    }
+  }
 
   return (
     <DashShell user={user}>
@@ -62,6 +94,36 @@ export default function Profile() {
             </div>
           )}
         </dl>
+      </section>
+
+      <section className="dash-panel backup-panel">
+        <h2 className="backup-panel__title">{b.title}</h2>
+        <p className="backup-panel__lead">{b.lead}</p>
+        <div className="backup-panel__actions">
+          <button type="button" className="btn btn-primary" onClick={handleExport}>
+            {b.exportBtn}
+          </button>
+          <button type="button" className="btn btn-ghost" onClick={handleImportClick}>
+            {b.importBtn}
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/json,.json"
+            className="backup-panel__file"
+            onChange={handleImportFile}
+          />
+        </div>
+        {message && (
+          <p className="backup-panel__ok" role="status">
+            {message}
+          </p>
+        )}
+        {error && (
+          <p className="backup-panel__err" role="alert">
+            {error}
+          </p>
+        )}
       </section>
     </DashShell>
   )

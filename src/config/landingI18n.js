@@ -173,6 +173,15 @@ const content = {
       studying: 'قيد الدراسة',
       noCompanyShort: 'لم تُختر شركة',
     },
+    backup: {
+      title: 'نقل البيانات بين الأجهزة',
+      lead: 'صدّر نسخة من حساباتك وشركاتك وميزانياتك، ثم استوردها على جهاز أو متصفح آخر (مثلاً من الموقع المنشور إلى المحلي).',
+      exportBtn: 'تصدير نسخة احتياطية',
+      importBtn: 'استيراد نسخة احتياطية',
+      exported: 'تم تنزيل ملف النسخة الاحتياطية.',
+      imported: 'تم الاستيراد. جارٍ فتح لوحة التحكم…',
+      importFailed: 'ملف غير صالح. اختر نسخة احتياطية صحيحة من Nidham.',
+    },
     companies: {
       kicker: 'شركات الدراسة',
       title: 'المؤسسات محل الدراسة',
@@ -470,6 +479,15 @@ const content = {
       logout: 'Déconnexion',
       studying: 'En étude',
       noCompanyShort: 'Aucune entreprise',
+    },
+    backup: {
+      title: 'Transfert des données',
+      lead: 'Exportez vos comptes, entreprises et bilans, puis importez-les sur un autre appareil ou navigateur (ex. du site publié vers le local).',
+      exportBtn: 'Exporter une sauvegarde',
+      importBtn: 'Importer une sauvegarde',
+      exported: 'Fichier de sauvegarde téléchargé.',
+      imported: 'Import réussi. Ouverture du tableau de bord…',
+      importFailed: 'Fichier invalide. Choisissez une sauvegarde Nidham.',
     },
     companies: {
       kicker: 'Entreprises étudiées',

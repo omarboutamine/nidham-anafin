@@ -1906,3 +1906,43 @@
     display: none;
   }
 }
+
+.backup-panel {
+  margin-top: 1rem;
+}
+
+.backup-panel__title {
+  margin: 0 0 0.4rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.backup-panel__lead {
+  margin: 0 0 1rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  max-width: 40rem;
+}
+
+.backup-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.backup-panel__file {
+  display: none;
+}
+
+.backup-panel__ok {
+  margin: 0.85rem 0 0;
+  color: #86efac;
+  font-weight: 700;
+}
+
+.backup-panel__err {
+  margin: 0.85rem 0 0;
+  color: #f87171;
+  font-weight: 700;
+}
+

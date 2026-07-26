@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nidham — نقل البيانات | Transfert des données</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0a0e1a;
+        --panel: #111827;
+        --text: #f3f4f6;
+        --muted: #9ca3af;
+        --gold: #d4af37;
+        --border: rgba(255, 255, 255, 0.12);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background: radial-gradient(circle at top, #1a2338, var(--bg));
+        color: var(--text);
+        padding: 2rem 1.25rem 3rem;
+      }
+      main {
+        max-width: 42rem;
+        margin: 0 auto;
+        background: rgba(17, 24, 39, 0.92);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.5rem;
+      }
+      h1 {
+        margin: 0 0 0.5rem;
+        font-size: 1.45rem;
+      }
+      p {
+        color: var(--muted);
+        line-height: 1.55;
+      }
+      ol {
+        color: var(--muted);
+        line-height: 1.6;
+        padding-inline-start: 1.25rem;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+        margin: 1.25rem 0;
+      }
+      button,
+      label.file-btn {
+        appearance: none;
+        border: 1px solid rgba(212, 175, 55, 0.45);
+        background: rgba(212, 175, 55, 0.12);
+        color: var(--gold);
+        border-radius: 999px;
+        padding: 0.55rem 1rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      button.ghost {
+        background: transparent;
+        color: var(--text);
+        border-color: var(--border);
+      }
+      label.file-btn input {
+        display: none;
+      }
+      #status {
+        margin-top: 0.75rem;
+        font-weight: 700;
+        min-height: 1.4rem;
+      }
+      #status.ok {
+        color: #86efac;
+      }
+      #status.err {
+        color: #fca5a5;
+      }
+      code {
+        color: var(--gold);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>نقل بيانات Anafin</h1>
+      <p>
+        كل الحسابات والشركات والميزانيات مخزّنة في متصفحك فقط (<code>localStorage</code>).
+        صدّر من الموقع المنشور، ثم استورد هنا على localhost (أو العكس).
+      </p>
+      <ol>
+        <li>افتح هذه الصفحة على المصدر (مثلاً الموقع المنشور).</li>
+        <li>اضغط <strong>تصدير JSON</strong> وحفظ الملف.</li>
+        <li>افتح هذه الصفحة على الوجهة (مثلاً <code>http://localhost:5140/transfer-data.html</code>).</li>
+        <li>اضغط <strong>استيراد JSON</strong> واختر الملف، ثم أعد تحميل التطبيق.</li>
+      </ol>
+
+      <div class="actions">
+        <button type="button" id="exportBtn">تصدير JSON</button>
+        <label class="file-btn">
+          استيراد JSON
+          <input id="importInput" type="file" accept="application/json,.json" />
+        </label>
+        <button type="button" class="ghost" id="countBtn">عدد المفاتيح الحالية</button>
+      </div>
+      <p id="status"></p>
+    </main>
+
+    <script>
+      const PREFIX = 'anafin_'
+      const statusEl = document.getElementById('status')
+
+      function setStatus(msg, ok) {
+        statusEl.textContent = msg
+        statusEl.className = ok ? 'ok' : 'err'
+      }
+
+      function collect() {
+        const data = {}
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i)
+          if (key && key.startsWith(PREFIX)) data[key] = localStorage.getItem(key)
+        }
+        return data
+      }
+
+      document.getElementById('exportBtn').addEventListener('click', () => {
+        const data = collect()
+        const payload = {
+          app: 'nidham-anafin',
+          version: 1,
+          exportedAt: new Date().toISOString(),
+          data,
+        }
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob)
+        a.download = 'anafin-data-export.json'
+        a.click()
+        URL.revokeObjectURL(a.href)
+        setStatus('تم التصدير: ' + Object.keys(data).length + ' مفتاحاً.', true)
+      })
+
+      document.getElementById('importInput').addEventListener('change', async (e) => {
+        const file = e.target.files && e.target.files[0]
+        if (!file) return
+        try {
+          const text = await file.text()
+          const parsed = JSON.parse(text)
+          const data = parsed.data && typeof parsed.data === 'object' ? parsed.data : parsed
+          const entries = Object.entries(data).filter(([k]) => k.startsWith(PREFIX))
+          if (!entries.length) throw new Error('لا توجد مفاتيح anafin_ في الملف')
+
+          const toRemove = []
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i)
+            if (key && key.startsWith(PREFIX)) toRemove.push(key)
+          }
+          toRemove.forEach((k) => localStorage.removeItem(k))
+          entries.forEach(([k, v]) => localStorage.setItem(k, String(v)))
+
+          setStatus('تم الاستيراد: ' + entries.length + ' مفتاحاً. افتح /login أو /dashboard.', true)
+        } catch (err) {
+          setStatus('فشل الاستيراد: ' + (err && err.message ? err.message : err), false)
+        } finally {
+          e.target.value = ''
+        }
+      })
+
+      document.getElementById('countBtn').addEventListener('click', () => {
+        setStatus('حالياً: ' + Object.keys(collect()).length + ' مفتاح anafin_ في هذا المتصفح.', true)
+      })
+    </script>
+  </body>
+</html>

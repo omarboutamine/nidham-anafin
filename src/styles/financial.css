@@ -984,23 +984,6 @@
   font-weight: 600;
 }
 
-.login-backup {
-  margin-top: 1.25rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  align-items: flex-start;
-}
-
-.login-backup__lead {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 0.88rem;
-  line-height: 1.5;
-}
-
 .admin-page {
   display: flex;
   flex-direction: column;
@@ -1924,42 +1907,37 @@
   }
 }
 
-.backup-panel {
+.data-transfer-panel {
   margin-top: 1rem;
 }
 
-.backup-panel__title {
+.data-transfer-panel__title {
   margin: 0 0 0.4rem;
   font-size: 1.1rem;
   font-weight: 800;
 }
 
-.backup-panel__lead {
-  margin: 0 0 1rem;
+.data-transfer-panel__lead {
+  margin: 0 0 0.9rem;
   color: var(--text-secondary);
   line-height: 1.55;
   max-width: 40rem;
 }
 
-.backup-panel__actions {
+.data-transfer-panel__actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.55rem;
 }
 
-.backup-panel__file {
-  display: none;
-}
-
-.backup-panel__ok {
-  margin: 0.85rem 0 0;
+.data-transfer-panel__ok {
+  margin: 0.75rem 0 0;
   color: #86efac;
   font-weight: 700;
 }
 
-.backup-panel__err {
-  margin: 0.85rem 0 0;
-  color: #f87171;
+.data-transfer-panel__err {
+  margin: 0.75rem 0 0;
+  color: #fca5a5;
   font-weight: 700;
 }
-

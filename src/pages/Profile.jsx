@@ -8,7 +8,7 @@ import {
 } from '../config/registerOptions'
 import { useLandingLang } from '../hooks/useLandingLang'
 import { getSessionUser } from '../services/authStore'
-import { downloadAnafinBackup, importAnafinBackup } from '../services/dataBackup'
+import { applyAnafinImport, downloadAnafinExport } from '../services/dataTransfer'
 import '../styles/landing-base.css'
 import '../styles/landing-extra.css'
 import '../styles/financial.css'
@@ -17,36 +17,33 @@ export default function Profile() {
   const { t, lang } = useLandingLang()
   const user = getSessionUser()
   const d = t.dashboard
-  const b = t.backup
+  const x = t.dataTransfer
   const fileRef = useRef(null)
-  const [message, setMessage] = useState('')
-  const [error, setError] = useState('')
+  const [msg, setMsg] = useState('')
+  const [err, setErr] = useState('')
 
   if (!user) return <Navigate to="/login" replace />
 
   const handleExport = () => {
-    setError('')
-    downloadAnafinBackup()
-    setMessage(b.exported)
+    setErr('')
+    const payload = downloadAnafinExport()
+    setMsg(x.exported.replace('{n}', String(Object.keys(payload.data).length)))
   }
 
-  const handleImportClick = () => fileRef.current?.click()
-
-  const handleImportFile = async (e) => {
+  const handleImport = async (e) => {
     const file = e.target.files?.[0]
-    e.target.value = ''
     if (!file) return
-    setError('')
-    setMessage('')
+    setErr('')
+    setMsg('')
     try {
       const text = await file.text()
-      importAnafinBackup(text)
-      setMessage(b.imported)
-      window.setTimeout(() => {
-        window.location.assign('/dashboard')
-      }, 700)
+      const n = applyAnafinImport(text, { clearExisting: true })
+      setMsg(x.imported.replace('{n}', String(n)))
+      window.setTimeout(() => window.location.assign('/dashboard'), 700)
     } catch {
-      setError(b.importFailed)
+      setErr(x.importFailed)
+    } finally {
+      e.target.value = ''
     }
   }
 
@@ -96,32 +93,26 @@ export default function Profile() {
         </dl>
       </section>
 
-      <section className="dash-panel backup-panel">
-        <h2 className="backup-panel__title">{b.title}</h2>
-        <p className="backup-panel__lead">{b.lead}</p>
-        <div className="backup-panel__actions">
+      <section className="dash-panel data-transfer-panel">
+        <h2 className="data-transfer-panel__title">{x.title}</h2>
+        <p className="data-transfer-panel__lead">{x.lead}</p>
+        <div className="data-transfer-panel__actions">
           <button type="button" className="btn btn-primary" onClick={handleExport}>
-            {b.exportBtn}
+            {x.exportBtn}
           </button>
-          <button type="button" className="btn btn-ghost" onClick={handleImportClick}>
-            {b.importBtn}
+          <button type="button" className="btn btn-ghost" onClick={() => fileRef.current?.click()}>
+            {x.importBtn}
           </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="application/json,.json"
-            className="backup-panel__file"
-            onChange={handleImportFile}
-          />
+          <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={handleImport} />
         </div>
-        {message && (
-          <p className="backup-panel__ok" role="status">
-            {message}
+        {msg && (
+          <p className="data-transfer-panel__ok" role="status">
+            {msg}
           </p>
         )}
-        {error && (
-          <p className="backup-panel__err" role="alert">
-            {error}
+        {err && (
+          <p className="data-transfer-panel__err" role="alert">
+            {err}
           </p>
         )}
       </section>

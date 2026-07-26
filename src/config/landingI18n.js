@@ -181,6 +181,7 @@ const content = {
       exported: 'تم تنزيل ملف النسخة الاحتياطية.',
       imported: 'تم الاستيراد. جارٍ فتح لوحة التحكم…',
       importFailed: 'ملف غير صالح. اختر نسخة احتياطية صحيحة من Nidham.',
+      loginHint: 'هل لديك نسخة احتياطية من موقع آخر؟ استوردها هنا دون الحاجة لتسجيل الدخول أولاً.',
     },
     companies: {
       kicker: 'شركات الدراسة',
@@ -488,6 +489,7 @@ const content = {
       exported: 'Fichier de sauvegarde téléchargé.',
       imported: 'Import réussi. Ouverture du tableau de bord…',
       importFailed: 'Fichier invalide. Choisissez une sauvegarde Nidham.',
+      loginHint: 'Vous avez une sauvegarde d’un autre site ? Importez-la ici sans vous connecter d’abord.',
     },
     companies: {
       kicker: 'Entreprises étudiées',

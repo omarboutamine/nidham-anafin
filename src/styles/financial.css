@@ -1707,22 +1707,33 @@
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
-  padding: 0.95rem 1.05rem;
-  border-radius: 12px;
+  padding: 1rem 1.15rem;
+  border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(10, 14, 26, 0.55);
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .company-card.is-active {
   border-color: rgba(212, 175, 55, 0.55);
-  background: rgba(212, 175, 55, 0.08);
+  background:
+    linear-gradient(120deg, rgba(212, 175, 55, 0.12), transparent 55%),
+    rgba(10, 14, 26, 0.65);
 }
 
 .company-card__main {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.3rem;
   min-width: 0;
+  flex: 1 1 12rem;
+}
+
+.company-card__title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
 }
 
 .company-card__name {
@@ -1735,20 +1746,44 @@
 }
 
 .company-card__badge {
-  align-self: flex-start;
-  margin-top: 0.25rem;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 800;
   color: var(--bg-primary, #0a0e1a);
   background: var(--accent-gold);
   border-radius: 999px;
-  padding: 0.15rem 0.55rem;
+  padding: 0.18rem 0.55rem;
+  letter-spacing: 0.02em;
 }
 
 .company-card__actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.45rem;
+}
+
+.company-card__nav {
+  display: inline-flex;
+  gap: 0.4rem;
+  padding: 0.2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  background: rgba(212, 175, 55, 0.06);
+}
+
+.company-card__nav .btn {
+  min-width: 4.5rem;
+  justify-content: center;
+}
+
+.company-card__delete {
+  opacity: 0.85;
+}
+
+.company-card__delete:hover {
+  opacity: 1;
+  border-color: rgba(248, 113, 113, 0.45);
+  color: #fca5a5;
 }
 
 .company-form-block {

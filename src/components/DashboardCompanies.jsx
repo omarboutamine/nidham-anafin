@@ -85,13 +85,15 @@ export default function DashboardCompanies({ user, t, lang }) {
               return (
                 <li key={co.id} className={`company-card ${isActive ? 'is-active' : ''}`}>
                   <div className="company-card__main">
-                    <strong className="company-card__name">{co.name}</strong>
+                    <div className="company-card__title-row">
+                      <strong className="company-card__name">{co.name}</strong>
+                      {isActive && <span className="company-card__badge">{c.activeBadge}</span>}
+                    </div>
                     <span className="company-card__meta">
                       {legalFormLabel(co.legalForm, lang)}
                       {co.wilaya ? ` · ${wilayaLabel(co.wilaya, lang)}` : ''}
                       {co.nif ? ` · NIF ${co.nif}` : ''}
                     </span>
-                    {isActive && <span className="company-card__badge">{c.activeBadge}</span>}
                   </div>
                   <div className="company-card__actions">
                     {!isActive && (
@@ -100,13 +102,18 @@ export default function DashboardCompanies({ user, t, lang }) {
                       </button>
                     )}
                     {isActive && (
-                      <Link to="/dashboard/bilan" className="btn btn-primary btn-sm">
-                        {c.openBilan}
-                      </Link>
+                      <div className="company-card__nav">
+                        <Link to="/dashboard/bilan" className="btn btn-primary btn-sm">
+                          {c.openBilan}
+                        </Link>
+                        <Link to="/dashboard/tcr" className="btn btn-primary btn-sm">
+                          {c.openTcr}
+                        </Link>
+                      </div>
                     )}
                     <button
                       type="button"
-                      className="btn btn-ghost btn-sm"
+                      className="btn btn-ghost btn-sm company-card__delete"
                       onClick={() => handleRemove(co.id, co.name)}
                     >
                       {c.remove}

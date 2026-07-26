@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 import SiteLogo from './SiteLogo'
 import { useLandingLang } from '../hooks/useLandingLang'
 import { logout } from '../services/authStore'
+import { getActiveCompany } from '../services/companyStore'
 import { ANALYSIS_MODULES } from '../services/analysisEngine'
 
 const ICONS = {
@@ -75,6 +76,21 @@ export default function DashShell({ user, children, showSidebar = false, activeS
   const navLabels = t.modules?.nav || {}
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef(null)
+  const [activeCompany, setActiveCompanyState] = useState(() => getActiveCompany(user.id))
+
+  useEffect(() => {
+    setActiveCompanyState(getActiveCompany(user.id))
+  }, [user.id])
+
+  useEffect(() => {
+    const sync = () => setActiveCompanyState(getActiveCompany(user.id))
+    window.addEventListener('focus', sync)
+    window.addEventListener('anafin:company-changed', sync)
+    return () => {
+      window.removeEventListener('focus', sync)
+      window.removeEventListener('anafin:company-changed', sync)
+    }
+  }, [user.id])
 
   useEffect(() => {
     if (!menuOpen) return undefined
@@ -121,6 +137,10 @@ export default function DashShell({ user, children, showSidebar = false, activeS
               {d.tcr}
             </NavLink>
           </nav>
+          <Link to="/dashboard" className="dash-company-chip" title={d.studying}>
+            <span className="dash-company-chip__label">{d.studying}</span>
+            <strong>{activeCompany?.name || d.noCompanyShort}</strong>
+          </Link>
         </div>
 
         <div className="dash-header-actions">

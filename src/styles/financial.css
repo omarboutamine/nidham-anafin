@@ -1671,3 +1671,184 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* —— Study companies (dashboard home) —— */
+.company-home {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+}
+
+.company-block-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.company-block-hint {
+  margin: 0 0 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 42rem;
+}
+
+.company-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.company-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.95rem 1.05rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(10, 14, 26, 0.55);
+}
+
+.company-card.is-active {
+  border-color: rgba(212, 175, 55, 0.55);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.company-card__main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.company-card__name {
+  font-size: 1.05rem;
+}
+
+.company-card__meta {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.company-card__badge {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--bg-primary, #0a0e1a);
+  background: var(--accent-gold);
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+}
+
+.company-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.company-form-block {
+  padding-top: 0.35rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.company-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem 1rem;
+}
+
+.company-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.company-field--wide {
+  grid-column: 1 / -1;
+}
+
+.company-form__actions {
+  margin-top: 1rem;
+}
+
+.company-form__error {
+  margin: 0.75rem 0 0;
+  color: #f87171;
+  font-weight: 700;
+}
+
+.company-form__flash {
+  margin: 0.75rem 0 0;
+  color: #86efac;
+  font-weight: 700;
+}
+
+.need-company {
+  padding: 2rem 1.35rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(17, 24, 39, 0.88);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-start;
+  max-width: 36rem;
+}
+
+.need-company__title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.need-company__lead {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.dash-company-chip {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  background: rgba(212, 175, 55, 0.08);
+  color: var(--text-primary);
+  max-width: 14rem;
+  min-width: 0;
+  text-decoration: none;
+}
+
+.dash-company-chip__label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.dash-company-chip strong {
+  font-size: 0.82rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 720px) {
+  .company-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-company-chip {
+    display: none;
+  }
+}

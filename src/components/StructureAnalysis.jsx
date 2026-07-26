@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { BILAN_SECTIONS, formatMoney, n } from '../config/financialTemplates'
 import { useLandingLang } from '../hooks/useLandingLang'
 import { loadFinancial } from '../services/financialStore'
+import NeedCompanyNotice from './NeedCompanyNotice'
 import YearToolbar from './YearToolbar'
 
 function pct(part, total) {
@@ -65,6 +66,10 @@ export default function StructureAnalysis({ user }) {
       empty: totalActif === 0 && totalPassif === 0,
     }
   }, [state])
+
+  if (state.noCompany) {
+    return <NeedCompanyNotice t={t} />
+  }
 
   return (
     <section className="analysis-page">

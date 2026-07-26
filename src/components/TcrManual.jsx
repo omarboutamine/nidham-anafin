@@ -1,6 +1,7 @@
 import { Fragment, useMemo, useState } from 'react'
 import { computeTcr, formatMoney, TCR_INPUTS } from '../config/financialTemplates'
 import { loadFinancial, saveFinancial } from '../services/financialStore'
+import NeedCompanyNotice from './NeedCompanyNotice'
 import YearToolbar from './YearToolbar'
 
 function inputLabel(row, lang) {
@@ -90,6 +91,10 @@ export default function TcrManual({ user, t, lang }) {
     },
     { id: '10', kind: 'total', label: f.tcr10, value: computed.net },
   ]
+
+  if (state.noCompany) {
+    return <NeedCompanyNotice t={t} />
+  }
 
   return (
     <section className="fin-panel">

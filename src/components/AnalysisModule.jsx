@@ -9,6 +9,7 @@ import {
   interpretConan,
 } from '../services/analysisEngine'
 import { listYears, loadFinancial } from '../services/financialStore'
+import NeedCompanyNotice from './NeedCompanyNotice'
 import YearToolbar from './YearToolbar'
 
 function statusTone(kind, value) {
@@ -473,6 +474,10 @@ export default function AnalysisModule({ user, moduleId }) {
 
   const title = meta.title || a.title
   const lead = meta.lead || a.lead
+
+  if (state.noCompany) {
+    return <NeedCompanyNotice t={t} />
+  }
 
   return (
     <section className="analysis-page">

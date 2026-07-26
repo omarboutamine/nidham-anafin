@@ -5,6 +5,7 @@ import {
   n,
 } from '../config/financialTemplates'
 import { loadFinancial, saveFinancial } from '../services/financialStore'
+import NeedCompanyNotice from './NeedCompanyNotice'
 import YearToolbar from './YearToolbar'
 
 function sectionLabel(section, lang) {
@@ -165,6 +166,10 @@ export default function BilanManual({ user, t, lang }) {
   }
 
   const balancePct = Math.min(100, (Math.min(totals.totalActif, totals.totalPassif) / totals.max) * 100)
+
+  if (state.noCompany) {
+    return <NeedCompanyNotice t={t} />
+  }
 
   return (
     <section className="fin-panel">

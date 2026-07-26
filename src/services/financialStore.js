@@ -1,20 +1,26 @@
 import { DEFAULT_BILAN_ROWS, emptyTcrAmounts } from '../config/financialTemplates'
+import { financialStorageKey, getActiveCompanyId } from './companyStore'
 
-function keyFor(userId) {
-  return `anafin_financial_${userId}`
+function keyFor(userId, companyId) {
+  const cid = companyId || getActiveCompanyId(userId)
+  return financialStorageKey(userId, cid)
 }
 
-function readRaw(userId) {
+function readRaw(userId, companyId) {
+  const key = keyFor(userId, companyId)
+  if (!key) return null
   try {
-    const raw = localStorage.getItem(keyFor(userId))
+    const raw = localStorage.getItem(key)
     return raw ? JSON.parse(raw) : null
   } catch {
     return null
   }
 }
 
-function writeRaw(userId, data) {
-  localStorage.setItem(keyFor(userId), JSON.stringify(data))
+function writeRaw(userId, data, companyId) {
+  const key = keyFor(userId, companyId)
+  if (!key) throw new Error('NO_COMPANY')
+  localStorage.setItem(key, JSON.stringify(data))
 }
 
 function blankYearData() {
@@ -67,37 +73,46 @@ function normalizeStore(stored) {
   }
 }
 
-export function listYears(userId) {
-  const store = normalizeStore(readRaw(userId))
+function requireCompany(userId, companyId) {
+  const cid = companyId || getActiveCompanyId(userId)
+  if (!cid) throw new Error('NO_COMPANY')
+  return cid
+}
+
+export function listYears(userId, companyId) {
+  const store = normalizeStore(readRaw(userId, companyId))
   return Object.keys(store.years).sort((a, b) => Number(b) - Number(a) || String(b).localeCompare(String(a)))
 }
 
-export function getActiveYear(userId) {
-  return normalizeStore(readRaw(userId)).activeYear
+export function getActiveYear(userId, companyId) {
+  return normalizeStore(readRaw(userId, companyId)).activeYear
 }
 
-export function setActiveYear(userId, year) {
-  const store = normalizeStore(readRaw(userId))
+export function setActiveYear(userId, year, companyId) {
+  requireCompany(userId, companyId)
+  const store = normalizeStore(readRaw(userId, companyId))
   const y = String(year).trim()
   if (!y) return store
   if (!store.years[y]) store.years[y] = blankYearData()
   store.activeYear = y
-  writeRaw(userId, store)
+  writeRaw(userId, store, companyId)
   return store
 }
 
-export function addYear(userId, year) {
+export function addYear(userId, year, companyId) {
+  requireCompany(userId, companyId)
   const y = String(year).trim()
   if (!/^\d{4}$/.test(y)) throw new Error('INVALID_YEAR')
-  const store = normalizeStore(readRaw(userId))
+  const store = normalizeStore(readRaw(userId, companyId))
   if (!store.years[y]) store.years[y] = blankYearData()
   store.activeYear = y
-  writeRaw(userId, store)
+  writeRaw(userId, store, companyId)
   return store
 }
 
-export function removeYear(userId, year) {
-  const store = normalizeStore(readRaw(userId))
+export function removeYear(userId, year, companyId) {
+  requireCompany(userId, companyId)
+  const store = normalizeStore(readRaw(userId, companyId))
   const y = String(year)
   const keys = Object.keys(store.years)
   if (keys.length <= 1 || !store.years[y]) return store
@@ -105,12 +120,28 @@ export function removeYear(userId, year) {
   if (store.activeYear === y) {
     store.activeYear = Object.keys(store.years).sort((a, b) => Number(b) - Number(a))[0]
   }
-  writeRaw(userId, store)
+  writeRaw(userId, store, companyId)
   return store
 }
 
-export function loadFinancial(userId, year) {
-  const store = normalizeStore(readRaw(userId))
+export function loadFinancial(userId, year, companyId) {
+  const cid = companyId || getActiveCompanyId(userId)
+  if (!cid) {
+    const y = String(year || currentYear())
+    const blank = blankYearData()
+    return {
+      activeYear: y,
+      years: [y],
+      exerciseLabel: y,
+      bilanRows: blank.bilanRows,
+      tcrAmounts: blank.tcrAmounts,
+      updatedAt: null,
+      noCompany: true,
+      companyId: null,
+    }
+  }
+
+  const store = normalizeStore(readRaw(userId, cid))
   const y = String(year || store.activeYear)
   const data = store.years[y] || blankYearData()
   return {
@@ -120,11 +151,14 @@ export function loadFinancial(userId, year) {
     bilanRows: data.bilanRows?.length ? data.bilanRows : blankYearData().bilanRows,
     tcrAmounts: { ...emptyTcrAmounts(), ...(data.tcrAmounts || {}) },
     updatedAt: data.updatedAt || null,
+    noCompany: false,
+    companyId: cid,
   }
 }
 
-export function saveFinancial(userId, patch) {
-  const store = normalizeStore(readRaw(userId))
+export function saveFinancial(userId, patch, companyId) {
+  const cid = requireCompany(userId, companyId)
+  const store = normalizeStore(readRaw(userId, cid))
   const y = String(patch.exerciseLabel || patch.activeYear || store.activeYear)
   if (!store.years[y]) store.years[y] = blankYearData()
   const prev = store.years[y]
@@ -134,6 +168,6 @@ export function saveFinancial(userId, patch) {
     updatedAt: new Date().toISOString(),
   }
   store.activeYear = y
-  writeRaw(userId, store)
-  return loadFinancial(userId, y)
+  writeRaw(userId, store, cid)
+  return loadFinancial(userId, y, cid)
 }

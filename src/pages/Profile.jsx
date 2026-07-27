@@ -93,29 +93,31 @@ export default function Profile() {
         </dl>
       </section>
 
-      <section className="dash-panel data-transfer-panel">
-        <h2 className="data-transfer-panel__title">{x.title}</h2>
-        <p className="data-transfer-panel__lead">{x.lead}</p>
-        <div className="data-transfer-panel__actions">
-          <button type="button" className="btn btn-primary" onClick={handleExport}>
-            {x.exportBtn}
-          </button>
-          <button type="button" className="btn btn-ghost" onClick={() => fileRef.current?.click()}>
-            {x.importBtn}
-          </button>
-          <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={handleImport} />
-        </div>
-        {msg && (
-          <p className="data-transfer-panel__ok" role="status">
-            {msg}
-          </p>
-        )}
-        {err && (
-          <p className="data-transfer-panel__err" role="alert">
-            {err}
-          </p>
-        )}
-      </section>
+      {user.role === 'superadmin' ? (
+        <section className="dash-panel data-transfer-panel">
+          <h2 className="data-transfer-panel__title">{x.title}</h2>
+          <p className="data-transfer-panel__lead">{x.lead}</p>
+          <div className="data-transfer-panel__actions">
+            <button type="button" className="btn btn-primary" onClick={handleExport}>
+              {x.exportBtn}
+            </button>
+            <button type="button" className="btn btn-ghost" onClick={() => fileRef.current?.click()}>
+              {x.importBtn}
+            </button>
+            <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={handleImport} />
+          </div>
+          {msg && (
+            <p className="data-transfer-panel__ok" role="status">
+              {msg}
+            </p>
+          )}
+          {err && (
+            <p className="data-transfer-panel__err" role="alert">
+              {err}
+            </p>
+          )}
+        </section>
+      ) : null}
     </DashShell>
   )
 }

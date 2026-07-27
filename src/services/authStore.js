@@ -1,5 +1,7 @@
 const USERS_KEY = 'anafin_users'
 const SESSION_KEY = 'anafin_session'
+/** One-shot cleanup: drop every account except the superadmin mailbox. */
+const PURGE_NON_ADMIN_FLAG = 'anafin_purge_non_admin_v1'
 
 /** Bootstrap superadmin mailbox (site owner). */
 export const SUPERADMIN_EMAIL = 'omarboutamine00@gmail.com'
@@ -18,6 +20,49 @@ function readUsers() {
 
 function writeUsers(users) {
   localStorage.setItem(USERS_KEY, JSON.stringify(users))
+}
+
+function removeStorageForUser(userId) {
+  if (!userId) return
+  const keys = []
+  for (let i = 0; i < localStorage.length; i += 1) {
+    const key = localStorage.key(i)
+    if (!key) continue
+    if (
+      key === `anafin_companies_${userId}` ||
+      key === `anafin_financial_${userId}` ||
+      key.startsWith(`anafin_financial_${userId}_`) ||
+      key.startsWith(`anafin_stats_sessions_${userId}_`)
+    ) {
+      keys.push(key)
+    }
+  }
+  keys.forEach((key) => localStorage.removeItem(key))
+}
+
+function purgeNonAdminUsers(users) {
+  if (localStorage.getItem(PURGE_NON_ADMIN_FLAG) === '1') {
+    return { users, purged: false }
+  }
+  const kept = []
+  const removedIds = []
+  for (const user of users) {
+    const email = String(user.email || '').toLowerCase()
+    if (email === SUPERADMIN_EMAIL) kept.push(user)
+    else removedIds.push(user.id)
+  }
+  removedIds.forEach(removeStorageForUser)
+  try {
+    const raw = localStorage.getItem(SESSION_KEY)
+    if (raw) {
+      const session = JSON.parse(raw)
+      if (removedIds.includes(session.userId)) localStorage.removeItem(SESSION_KEY)
+    }
+  } catch {
+    /* ignore */
+  }
+  localStorage.setItem(PURGE_NON_ADMIN_FLAG, '1')
+  return { users: kept, purged: removedIds.length > 0 || kept.length !== users.length }
 }
 
 async function hashPassword(password, salt) {
@@ -71,6 +116,10 @@ function migrateUsers() {
       mutated = true
     }
   }
+
+  const purged = purgeNonAdminUsers(users)
+  users = purged.users
+  if (purged.purged) mutated = true
 
   users = users.map(withDefaults)
   const prev = readUsers()

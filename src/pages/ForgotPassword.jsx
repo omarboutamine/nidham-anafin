@@ -208,7 +208,7 @@ export default function ForgotPassword() {
               </button>
               <button
                 type="button"
-                className="btn btn-ghost register-resend"
+                className="btn btn-ghost btn-lg register-resend"
                 disabled={loading || remainingSec > getOtpTtlMs() / 1000 - 15}
                 onClick={() => sendCode({ preventDefault() {} })}
               >

@@ -439,6 +439,25 @@ select.register-input option {
 
 .register-resend {
   width: 100%;
+  margin-top: 0.45rem;
+  min-height: 2.85rem;
+  border: 1px solid rgba(212, 175, 55, 0.45) !important;
+  color: var(--accent-gold) !important;
+  background: rgba(212, 175, 55, 0.08) !important;
+  font-weight: 700;
+}
+
+.register-resend:hover:not(:disabled) {
+  border-color: var(--accent-gold) !important;
+  background: rgba(212, 175, 55, 0.16) !important;
+  color: #f5e6a8 !important;
+  transform: translateY(-1px);
+}
+
+.register-resend:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .login-card--form {

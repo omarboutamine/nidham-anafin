@@ -401,7 +401,7 @@ export default function StudentRegisterModal({ open, onClose, t, dir, lang }) {
               </button>
               <button
                 type="button"
-                className="btn btn-ghost register-resend"
+                className="btn btn-ghost btn-lg register-resend"
                 onClick={handleResendOtp}
                 disabled={loading || remainingSec > getOtpTtlMs() / 1000 - 15}
               >

@@ -6,6 +6,7 @@ export const modulesAr = {
   toneBad: 'ضعيف',
   nav: {
     structure: 'تحليل الهيكل المالي',
+    deepReading: 'قراءة معمقة',
     cockpit: 'لوحة الأسواق',
     liquidity: 'تحليل السيولة',
     solvency: 'تحليل الملاءة',
@@ -17,6 +18,7 @@ export const modulesAr = {
   },
   navDesc: {
     structure: 'توزيع الأصول والخصوم ومؤشرات التوازن',
+    deepReading: 'رسوم وقراءة لكل السنوات المدروسة',
     cockpit: 'قراءة فورية بأسلوب مكاتب الأسواق',
     liquidity: 'نسب السيولة العامة والسريعة والنقدية',
     solvency: 'المديونية، الاستقلالية، FRNG وBFR',
@@ -169,6 +171,7 @@ export const modulesFr = {
   toneBad: 'Fragile',
   nav: {
     structure: 'Analyse de la structure financière',
+    deepReading: 'Lecture approfondie',
     cockpit: 'Cockpit marchés',
     liquidity: 'Analyse de liquidité',
     solvency: 'Analyse de solvabilité',
@@ -180,6 +183,7 @@ export const modulesFr = {
   },
   navDesc: {
     structure: 'Répartition Actif / Passif et équilibre',
+    deepReading: 'Graphiques et lecture sur tous les exercices',
     cockpit: 'Lecture instantanée façon desk de marchés',
     liquidity: 'Ratios Current / Quick / Cash',
     solvency: 'Endettement, autonomie, FRNG et BFR',

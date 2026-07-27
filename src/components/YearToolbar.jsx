@@ -1,8 +1,18 @@
 import { useState } from 'react'
+import { useLandingLang } from '../hooks/useLandingLang'
 import { addYear, listYears, removeYear, setActiveYear } from '../services/financialStore'
 
-export default function YearToolbar({ userId, activeYear, onYearChange, t, getYearTemplate }) {
+export default function YearToolbar({
+  userId,
+  activeYear,
+  onYearChange,
+  t,
+  getYearTemplate,
+  /** Only financial statements pages may create/delete years. */
+  allowYearManage = false,
+}) {
   const f = t.financial
+  const { dir } = useLandingLang()
   const [years, setYears] = useState(() => listYears(userId))
   const [draft, setDraft] = useState('')
   const [error, setError] = useState('')
@@ -20,6 +30,7 @@ export default function YearToolbar({ userId, activeYear, onYearChange, t, getYe
 
   const handleAdd = (e) => {
     e.preventDefault()
+    if (!allowYearManage) return
     setError('')
     const y = draft.trim()
     try {
@@ -33,6 +44,7 @@ export default function YearToolbar({ userId, activeYear, onYearChange, t, getYe
   }
 
   const handleRemove = () => {
+    if (!allowYearManage) return
     if (years.length <= 1) {
       setError(f.yearKeepOne)
       return
@@ -43,40 +55,56 @@ export default function YearToolbar({ userId, activeYear, onYearChange, t, getYe
   }
 
   return (
-    <div className="year-toolbar">
-      <label className="year-toolbar__label">
-        {f.exercise}
-        <select
-          className="fin-input year-toolbar__select"
-          value={activeYear}
-          onChange={(e) => handleSelect(e.target.value)}
-        >
-          {years.map((y) => (
-            <option key={y} value={y}>
-              {y}
-            </option>
-          ))}
-        </select>
-      </label>
+    <div className={`year-toolbar ${allowYearManage ? '' : 'year-toolbar--select-only'}`.trim()} dir={dir}>
+      <div className="year-toolbar__block">
+        <span className="year-toolbar__caption">{f.exercise}</span>
+        <div className="year-toolbar__years" role="tablist" aria-label={f.exercise} dir={dir}>
+          {years.map((y) => {
+            const selected = String(y) === String(activeYear)
+            return (
+              <button
+                key={y}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                className={`year-chip ${selected ? 'is-active' : ''}`}
+                onClick={() => handleSelect(y)}
+              >
+                {y}
+              </button>
+            )
+          })}
+        </div>
+      </div>
 
-      <form className="year-toolbar__add" onSubmit={handleAdd}>
-        <input
-          className="fin-input year-toolbar__draft"
-          inputMode="numeric"
-          maxLength={4}
-          placeholder={f.yearPlaceholder}
-          value={draft}
-          onChange={(e) => setDraft(e.target.value.replace(/\D/g, '').slice(0, 4))}
-          aria-label={f.addYear}
-        />
-        <button type="submit" className="btn btn-ghost btn-sm">
-          {f.addYear}
-        </button>
-      </form>
+      {allowYearManage && (
+        <div className="year-toolbar__actions">
+          <form className="year-toolbar__add" onSubmit={handleAdd}>
+            <input
+              className="year-toolbar__draft"
+              inputMode="numeric"
+              maxLength={4}
+              placeholder={f.yearPlaceholder}
+              value={draft}
+              onChange={(e) => setDraft(e.target.value.replace(/\D/g, '').slice(0, 4))}
+              aria-label={f.addYear}
+            />
+            <button type="submit" className="year-toolbar__btn year-toolbar__btn--accent" title={f.addYear}>
+              <span aria-hidden="true">+</span>
+              <span className="year-toolbar__btn-text">{f.addYear}</span>
+            </button>
+          </form>
 
-      <button type="button" className="btn btn-ghost btn-sm year-toolbar__remove" onClick={handleRemove}>
-        {f.removeYear}
-      </button>
+          <button
+            type="button"
+            className="year-toolbar__btn year-toolbar__btn--muted"
+            onClick={handleRemove}
+            title={f.removeYear}
+          >
+            <span className="year-toolbar__btn-text">{f.removeYear}</span>
+          </button>
+        </div>
+      )}
 
       {error && (
         <span className="year-toolbar__error" role="alert">

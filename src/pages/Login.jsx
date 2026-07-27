@@ -1,9 +1,8 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import SiteLogo from '../components/SiteLogo'
 import { useLandingLang } from '../hooks/useLandingLang'
 import { getSessionUser, loginWithPassword } from '../services/authStore'
-import { importAnafinBackup } from '../services/dataBackup'
 import '../styles/landing-base.css'
 import '../styles/landing-extra.css'
 import '../styles/financial.css'
@@ -12,12 +11,10 @@ export default function Login() {
   const { t, dir, lang, setLang } = useLandingLang()
   const navigate = useNavigate()
   const existing = getSessionUser()
-  const fileRef = useRef(null)
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [info, setInfo] = useState('')
   const [loading, setLoading] = useState(false)
 
   if (existing) return <Navigate to="/dashboard" replace />
@@ -25,7 +22,6 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-    setInfo('')
     if (!email.trim() || !password) {
       setError(t.login.errors.required)
       return
@@ -39,24 +35,6 @@ export default function Login() {
       else setError(t.login.errors.invalid)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleImportFile = async (e) => {
-    const file = e.target.files?.[0]
-    e.target.value = ''
-    if (!file) return
-    setError('')
-    setInfo('')
-    try {
-      const text = await file.text()
-      importAnafinBackup(text)
-      setInfo(t.backup.imported)
-      window.setTimeout(() => {
-        window.location.assign('/dashboard')
-      }, 500)
-    } catch {
-      setError(t.backup.importFailed)
     }
   }
 
@@ -98,11 +76,6 @@ export default function Login() {
                 {error}
               </div>
             )}
-            {info && (
-              <div className="register-success" role="status">
-                {info}
-              </div>
-            )}
             <label className="register-label">
               {t.register.email}
               <input
@@ -134,20 +107,6 @@ export default function Login() {
               {loading ? t.login.submitting : t.login.submit}
             </button>
           </form>
-
-          <div className="login-backup">
-            <p className="login-backup__lead">{t.backup.loginHint}</p>
-            <button type="button" className="btn btn-ghost" onClick={() => fileRef.current?.click()}>
-              {t.backup.importBtn}
-            </button>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="application/json,.json"
-              className="backup-panel__file"
-              onChange={handleImportFile}
-            />
-          </div>
 
           <Link to="/" className="login-back">
             {t.login.backHome}

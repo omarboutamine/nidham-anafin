@@ -1,9 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   BILAN_SECTIONS,
   formatMoney,
   n,
 } from '../config/financialTemplates'
+import {
+  buildLabelPatch,
+  healBilanRowLabels,
+  resolveRowLabel,
+} from '../config/labelI18n'
 import { loadFinancial, saveFinancial } from '../services/financialStore'
 import NeedCompanyNotice from './NeedCompanyNotice'
 import YearToolbar from './YearToolbar'
@@ -12,39 +17,58 @@ function sectionLabel(section, lang) {
   return lang === 'ar' ? section.ar : section.fr
 }
 
-function rowLabel(row, lang) {
-  return lang === 'ar' ? row.labelAr : row.labelFr
-}
-
 export default function BilanManual({ user, t, lang }) {
   const f = t.financial
-  const [state, setState] = useState(() => loadFinancial(user.id))
+  const [state, setState] = useState(() => {
+    const loaded = loadFinancial(user.id)
+    return {
+      ...loaded,
+      bilanRows: healBilanRowLabels(loaded.bilanRows, f.newLine),
+    }
+  })
   const [savedFlash, setSavedFlash] = useState(false)
 
+  useEffect(() => {
+    setState((prev) => {
+      const healed = healBilanRowLabels(prev.bilanRows, f.newLine)
+      const changed = healed.some((row, i) => row !== prev.bilanRows[i])
+      return changed ? { ...prev, bilanRows: healed } : prev
+    })
+  }, [lang, f.newLine])
+
   const onYearChange = (year) => {
-    setState(loadFinancial(user.id, year))
+    const loaded = loadFinancial(user.id, year)
+    setState({
+      ...loaded,
+      bilanRows: healBilanRowLabels(loaded.bilanRows, f.newLine),
+    })
     setSavedFlash(false)
   }
 
   const persist = () => {
+    const healed = healBilanRowLabels(state.bilanRows, f.newLine)
     const saved = saveFinancial(user.id, {
       exerciseLabel: state.activeYear || state.exerciseLabel,
-      bilanRows: state.bilanRows,
+      bilanRows: healed,
     })
-    setState(saved)
+    setState({
+      ...saved,
+      bilanRows: healBilanRowLabels(saved.bilanRows, f.newLine),
+    })
     setSavedFlash(true)
     window.setTimeout(() => setSavedFlash(false), 1600)
   }
 
   const getYearTemplate = () => {
+    const healed = healBilanRowLabels(state.bilanRows, f.newLine)
     const saved = saveFinancial(user.id, {
       exerciseLabel: state.activeYear || state.exerciseLabel,
-      bilanRows: state.bilanRows,
+      bilanRows: healed,
       tcrAmounts: state.tcrAmounts,
     })
     setState((prev) => ({
       ...prev,
-      bilanRows: saved.bilanRows,
+      bilanRows: healBilanRowLabels(saved.bilanRows, f.newLine),
       tcrAmounts: saved.tcrAmounts,
       updatedAt: saved.updatedAt,
     }))
@@ -56,6 +80,10 @@ export default function BilanManual({ user, t, lang }) {
     setState((prev) => ({ ...prev, bilanRows }))
   }
 
+  const updateLabel = (row, value) => {
+    updateRow(row.id, buildLabelPatch(row, lang, value, f.newLine))
+  }
+
   const addRow = (section) => {
     const id = `custom_${Date.now()}`
     const bilanRows = [
@@ -64,8 +92,8 @@ export default function BilanManual({ user, t, lang }) {
         id,
         section,
         number: '',
-        labelFr: lang === 'fr' ? f.newLine : 'Nouveau poste',
-        labelAr: lang === 'ar' ? f.newLine : 'بند جديد',
+        labelFr: 'Nouveau poste',
+        labelAr: 'بند جديد',
         amount: '',
         custom: true,
       },
@@ -130,10 +158,8 @@ export default function BilanManual({ user, t, lang }) {
                       <td>
                         <input
                           className="fin-input"
-                          value={rowLabel(row, lang)}
-                          onChange={(e) =>
-                            updateRow(row.id, lang === 'ar' ? { labelAr: e.target.value } : { labelFr: e.target.value })
-                          }
+                          value={resolveRowLabel(row, lang, f.newLine)}
+                          onChange={(e) => updateLabel(row, e.target.value)}
                         />
                       </td>
                       <td>
@@ -205,6 +231,7 @@ export default function BilanManual({ user, t, lang }) {
             onYearChange={onYearChange}
             t={t}
             getYearTemplate={getYearTemplate}
+            allowYearManage
           />
           <button type="button" className="btn btn-primary" onClick={persist}>
             {f.save}

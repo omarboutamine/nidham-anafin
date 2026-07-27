@@ -67,6 +67,14 @@ const ICONS = {
       <circle cx="20" cy="18" r="2" />
     </svg>
   ),
+  book: (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z" />
+      <path d="M4 5.5V21.5" />
+      <path d="M8 7h8" />
+      <path d="M8 11h8" />
+    </svg>
+  ),
 }
 
 export default function DashShell({ user, children, showSidebar = false, activeSidebar }) {

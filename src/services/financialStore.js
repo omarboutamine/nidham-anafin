@@ -122,7 +122,7 @@ function requireCompany(userId, companyId) {
 
 export function listYears(userId, companyId) {
   const store = normalizeStore(readRaw(userId, companyId))
-  return Object.keys(store.years).sort((a, b) => Number(b) - Number(a) || String(b).localeCompare(String(a)))
+  return Object.keys(store.years).sort((a, b) => Number(a) - Number(b) || String(a).localeCompare(String(b)))
 }
 
 export function getActiveYear(userId, companyId) {

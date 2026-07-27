@@ -8,6 +8,7 @@ import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Profile from './pages/Profile'
 import AnalysisModulePage from './pages/AnalysisModulePage'
+import DeepReadingPage from './pages/DeepReadingPage'
 import StructureAnalysisPage from './pages/StructureAnalysisPage'
 import TcrPage from './pages/TcrPage'
 
@@ -55,6 +56,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <StructureAnalysisPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/analyse-lecture-approfondie"
+          element={
+            <ProtectedRoute>
+              <DeepReadingPage />
             </ProtectedRoute>
           }
         />

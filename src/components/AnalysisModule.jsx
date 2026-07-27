@@ -460,7 +460,7 @@ export default function AnalysisModule({ user, moduleId }) {
   )
 
   const series = useMemo(() => {
-    const years = listYears(user.id).slice().reverse()
+    const years = listYears(user.id)
     return years
       .map((y) => {
         const data = loadFinancial(user.id, y)

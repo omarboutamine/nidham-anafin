@@ -126,6 +126,7 @@ export default function TcrManual({ user, t, lang }) {
             onYearChange={onYearChange}
             t={t}
             getYearTemplate={getYearTemplate}
+            allowYearManage
           />
           <button type="button" className="btn btn-primary" onClick={persist}>
             {f.save}

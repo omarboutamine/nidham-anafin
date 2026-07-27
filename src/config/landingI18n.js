@@ -130,6 +130,7 @@ const content = {
       submitting: 'جاري التحقق…',
       backHome: 'العودة للرئيسية',
       forgot: 'نسيت كلمة السر؟',
+      importLead: 'نقلت البيانات من جهاز أو localhost؟ استورد ملف JSON هنا ثم سجّل الدخول.',
       errors: {
         required: 'البريد وكلمة المرور مطلوبان.',
         invalid: 'بيانات الدخول غير صحيحة.',
@@ -175,7 +176,7 @@ const content = {
     },
     dataTransfer: {
       title: 'نقل البيانات بين الأجهزة / البيئات',
-      lead: 'الحسابات والشركات والقوائم المالية محفوظة في متصفحك. صدّر ملف JSON من الموقع المنشور ثم استورده على localhost.',
+      lead: 'الحسابات والشركات والقوائم المالية محفوظة في متصفحك. صدّر ملف JSON من localhost ثم استورده على الموقع المنشور (أو العكس).',
       exportBtn: 'تصدير كل البيانات',
       importBtn: 'استيراد ملف JSON',
       exported: 'تم التصدير ({n} مفتاحاً).',
@@ -497,6 +498,7 @@ const content = {
       submitting: 'Vérification…',
       backHome: "Retour à l'accueil",
       forgot: 'Mot de passe oublié ?',
+      importLead: 'Données venues d’un autre appareil ou de localhost ? Importez le JSON ici puis connectez-vous.',
       errors: {
         required: "L'e-mail et le mot de passe sont requis.",
         invalid: 'Identifiants incorrects.',
@@ -543,7 +545,7 @@ const content = {
     },
     dataTransfer: {
       title: 'Transfert des données entre environnements',
-      lead: 'Comptes, entreprises et états financiers sont stockés dans votre navigateur. Exportez un JSON depuis le site publié puis importez-le sur localhost.',
+      lead: 'Comptes, entreprises et états financiers sont stockés dans votre navigateur. Exportez un JSON depuis localhost puis importez-le sur le site publié (ou l’inverse).',
       exportBtn: 'Exporter toutes les données',
       importBtn: 'Importer un fichier JSON',
       exported: 'Export terminé ({n} clés).',

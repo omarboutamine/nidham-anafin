@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import SiteLogo from '../components/SiteLogo'
 import { useLandingLang } from '../hooks/useLandingLang'
 import { getSessionUser, loginWithPassword } from '../services/authStore'
+import { applyAnafinImport } from '../services/dataTransfer'
 import '../styles/landing-base.css'
 import '../styles/landing-extra.css'
 import '../styles/financial.css'
@@ -11,11 +12,15 @@ export default function Login() {
   const { t, dir, lang, setLang } = useLandingLang()
   const navigate = useNavigate()
   const existing = getSessionUser()
+  const fileRef = useRef(null)
+  const x = t.dataTransfer
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [importMsg, setImportMsg] = useState('')
+  const [importErr, setImportErr] = useState('')
 
   if (existing) return <Navigate to="/dashboard" replace />
 
@@ -35,6 +40,23 @@ export default function Login() {
       else setError(t.login.errors.invalid)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleImport = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setImportErr('')
+    setImportMsg('')
+    try {
+      const text = await file.text()
+      const n = applyAnafinImport(text, { clearExisting: true })
+      setImportMsg(x.imported.replace('{n}', String(n)))
+      window.setTimeout(() => window.location.reload(), 700)
+    } catch {
+      setImportErr(x.importFailed)
+    } finally {
+      e.target.value = ''
     }
   }
 
@@ -107,6 +129,24 @@ export default function Login() {
               {loading ? t.login.submitting : t.login.submit}
             </button>
           </form>
+
+          <div className="login-backup">
+            <p className="login-backup__lead">{t.login.importLead}</p>
+            <button type="button" className="btn btn-ghost" onClick={() => fileRef.current?.click()}>
+              {x.importBtn}
+            </button>
+            <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={handleImport} />
+            {importMsg && (
+              <p className="data-transfer-panel__ok" role="status">
+                {importMsg}
+              </p>
+            )}
+            {importErr && (
+              <p className="data-transfer-panel__err" role="alert">
+                {importErr}
+              </p>
+            )}
+          </div>
 
           <Link to="/" className="login-back">
             {t.login.backHome}

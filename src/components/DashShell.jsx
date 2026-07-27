@@ -5,6 +5,7 @@ import { useLandingLang } from '../hooks/useLandingLang'
 import { logout } from '../services/authStore'
 import { getActiveCompany } from '../services/companyStore'
 import { ANALYSIS_MODULES } from '../services/analysisEngine'
+import { downloadCompanyResearchPack } from '../services/researchExport'
 
 const ICONS = {
   chart: (
@@ -75,16 +76,25 @@ const ICONS = {
       <path d="M8 11h8" />
     </svg>
   ),
+  sigma: (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M5 5h14l-7 7 7 7H5" />
+    </svg>
+  ),
 }
 
 export default function DashShell({ user, children, showSidebar = false, activeSidebar }) {
   const { t, dir, lang, setLang } = useLandingLang()
   const navigate = useNavigate()
   const d = t.dashboard
+  const c = t.companies
   const navLabels = t.modules?.nav || {}
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef(null)
   const [activeCompany, setActiveCompanyState] = useState(() => getActiveCompany(user.id))
+  const [exporting, setExporting] = useState(false)
+  const [exportMsg, setExportMsg] = useState('')
+  const [exportErr, setExportErr] = useState('')
 
   useEffect(() => {
     setActiveCompanyState(getActiveCompany(user.id))
@@ -121,6 +131,23 @@ export default function DashShell({ user, children, showSidebar = false, activeS
     navigate('/', { replace: true })
   }
 
+  const handleDownloadResearch = async () => {
+    if (!activeCompany) return
+    setExportMsg('')
+    setExportErr('')
+    setExporting(true)
+    try {
+      await downloadCompanyResearchPack(user.id, activeCompany)
+      setExportMsg(c.downloadResearchDone)
+      window.setTimeout(() => setExportMsg(''), 2800)
+    } catch (err) {
+      setExportErr(err?.message === 'EMPTY_DATA' ? c.downloadResearchEmpty : c.downloadResearchFailed)
+      window.setTimeout(() => setExportErr(''), 4000)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   return (
     <div className={`dash-page ${showSidebar ? 'dash-page--with-sidebar' : ''}`} dir={dir}>
       <header className="dash-header">
@@ -144,6 +171,17 @@ export default function DashShell({ user, children, showSidebar = false, activeS
             >
               {d.tcr}
             </NavLink>
+            {activeCompany && (
+              <button
+                type="button"
+                className="dash-header-nav__link dash-header-nav__btn"
+                disabled={exporting}
+                onClick={handleDownloadResearch}
+                title={c.downloadResearch}
+              >
+                {exporting ? c.downloadResearchBusy : c.downloadResearch}
+              </button>
+            )}
           </nav>
           <Link to="/dashboard" className="dash-company-chip" title={d.studying}>
             <span className="dash-company-chip__label">{d.studying}</span>
@@ -217,6 +255,12 @@ export default function DashShell({ user, children, showSidebar = false, activeS
           </div>
         </div>
       </header>
+
+      {(exportMsg || exportErr) && (
+        <div className={`dash-export-toast ${exportErr ? 'is-err' : 'is-ok'}`} role={exportErr ? 'alert' : 'status'}>
+          {exportErr || exportMsg}
+        </div>
+      )}
 
       <div className={`dash-body ${showSidebar ? 'dash-body--split' : ''}`}>
         {showSidebar && (

@@ -185,11 +185,6 @@ export const ANALYSIS_MODULES = [
     icon: 'chart',
   },
   {
-    id: 'deepReading',
-    path: '/dashboard/analyse-lecture-approfondie',
-    icon: 'book',
-  },
-  {
     id: 'cockpit',
     path: '/dashboard/analyse/cockpit',
     icon: 'pulse',
@@ -228,5 +223,10 @@ export const ANALYSIS_MODULES = [
     id: 'trends',
     path: '/dashboard/analyse/tendances',
     icon: 'timeline',
+  },
+  {
+    id: 'stats',
+    path: '/dashboard/analyse-statistique',
+    icon: 'sigma',
   },
 ]

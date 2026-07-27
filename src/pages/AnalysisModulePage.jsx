@@ -7,7 +7,9 @@ import '../styles/landing-base.css'
 import '../styles/landing-extra.css'
 import '../styles/financial.css'
 
-const VALID = new Set(ANALYSIS_MODULES.filter((m) => m.id !== 'structure').map((m) => m.id))
+const VALID = new Set(
+  ANALYSIS_MODULES.filter((m) => !['structure', 'deepReading', 'stats'].includes(m.id)).map((m) => m.id),
+)
 
 const ROUTE_TO_ID = {
   cockpit: 'cockpit',

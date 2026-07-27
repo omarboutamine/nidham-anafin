@@ -119,7 +119,7 @@ export default function StructureAnalysis({ user }) {
               closeLabel={a.infoClose}
             />
           </div>
-          <Link to="/dashboard/analyse-lecture-approfondie" className="deep-reading-cta">
+          <Link to="/dashboard/analyse-lecture-approfondie?scope=structure" className="deep-reading-cta">
             {a.deepReadingCta}
           </Link>
         </div>

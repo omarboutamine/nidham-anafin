@@ -4,6 +4,7 @@ export const modulesAr = {
   toneGood: 'جيد',
   toneOk: 'مقبول',
   toneBad: 'ضعيف',
+  infoClose: 'حسناً',
   nav: {
     structure: 'تحليل الهيكل المالي',
     deepReading: 'قراءة معمقة',
@@ -15,6 +16,7 @@ export const modulesAr = {
     dupont: 'تفكيك DuPont',
     score: 'تنقيط Conan-Holder',
     trends: 'الاتجاهات متعددة السنوات',
+    stats: 'التحليل الإحصائي',
   },
   navDesc: {
     structure: 'توزيع الأصول والخصوم ومؤشرات التوازن',
@@ -27,6 +29,7 @@ export const modulesAr = {
     dupont: 'هامش × دوران × رافعة = ROE',
     score: 'درجة خطر ائتماني تعليمية',
     trends: 'مقارنة المؤشرات عبر السنوات',
+    stats: 'وصف، ارتباط، انحدار، قوالب ومقارنة الشركات',
   },
   cockpit: {
     title: 'لوحة الأسواق المالية',
@@ -169,6 +172,7 @@ export const modulesFr = {
   toneGood: 'Solide',
   toneOk: 'Correct',
   toneBad: 'Fragile',
+  infoClose: 'OK',
   nav: {
     structure: 'Analyse de la structure financière',
     deepReading: 'Lecture approfondie',
@@ -180,6 +184,7 @@ export const modulesFr = {
     dupont: 'Décomposition DuPont',
     score: 'Score Conan-Holder',
     trends: 'Tendances multi-exercices',
+    stats: 'Analyse statistique',
   },
   navDesc: {
     structure: 'Répartition Actif / Passif et équilibre',
@@ -192,6 +197,7 @@ export const modulesFr = {
     dupont: 'Marge × rotation × levier = ROE',
     score: 'Score de risque pédagogique',
     trends: 'Comparaison des ratios dans le temps',
+    stats: 'Descriptif, corrélation, régression, modèles et comparaison',
   },
   cockpit: {
     title: 'Cockpit marchés financiers',

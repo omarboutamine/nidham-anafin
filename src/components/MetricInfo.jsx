@@ -50,7 +50,11 @@ export default function MetricInfo({
         className="metric-info__btn"
         aria-label={title}
         aria-describedby={tipId}
-        onClick={() => setOpen(true)}
+        onClick={(e) => {
+          e.stopPropagation()
+          e.preventDefault()
+          setOpen(true)
+        }}
       >
         !
         <span id={tipId} role="tooltip" className="metric-info__tooltip">

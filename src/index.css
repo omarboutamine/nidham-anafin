@@ -21,7 +21,7 @@
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
   --container: min(1200px, 100% - 2rem);
   --header-height: 64px;
-  --text-base: 0.9375rem;
+  --text-base: 0.875rem;
 }
 
 html {

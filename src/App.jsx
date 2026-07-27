@@ -9,6 +9,7 @@ import Login from './pages/Login'
 import Profile from './pages/Profile'
 import AnalysisModulePage from './pages/AnalysisModulePage'
 import DeepReadingPage from './pages/DeepReadingPage'
+import StatisticalAnalysisPage from './pages/StatisticalAnalysisPage'
 import StructureAnalysisPage from './pages/StructureAnalysisPage'
 import TcrPage from './pages/TcrPage'
 
@@ -64,6 +65,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <DeepReadingPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/analyse-statistique"
+          element={
+            <ProtectedRoute>
+              <StatisticalAnalysisPage />
             </ProtectedRoute>
           }
         />

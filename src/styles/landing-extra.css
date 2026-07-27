@@ -367,7 +367,7 @@
 
 .dash-title {
   margin: 0;
-  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  font-size: clamp(1.35rem, 2.5vw, 1.85rem);
   font-weight: 800;
 }
 

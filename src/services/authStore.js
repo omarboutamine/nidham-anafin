@@ -2,7 +2,10 @@ const USERS_KEY = 'anafin_users'
 const SESSION_KEY = 'anafin_session'
 
 /** Bootstrap superadmin mailbox (site owner). */
-export const SUPERADMIN_EMAIL = 'omar.boutamine@univ-constantine2.dz'
+export const SUPERADMIN_EMAIL = 'omarboutamine00@gmail.com'
+
+/** Previous admin mailbox — migrated once to SUPERADMIN_EMAIL in localStorage. */
+const LEGACY_SUPERADMIN_EMAILS = ['omar.boutamine@univ-constantine2.dz']
 
 function readUsers() {
   try {
@@ -40,18 +43,43 @@ function makeId() {
 function withDefaults(user) {
   return {
     ...user,
-    role: user.role || (user.email === SUPERADMIN_EMAIL ? 'superadmin' : 'user'),
+    role: user.email === SUPERADMIN_EMAIL ? 'superadmin' : 'user',
     active: user.active !== false,
   }
 }
 
 function migrateUsers() {
-  const users = readUsers().map(withDefaults)
-  const changed = users.some((u, i) => {
-    const raw = readUsers()[i]
-    return raw?.role !== u.role || raw?.active !== u.active
-  })
-  if (changed || readUsers().length !== users.length) writeUsers(users)
+  let users = readUsers()
+  let mutated = false
+
+  for (const legacyEmail of LEGACY_SUPERADMIN_EMAILS) {
+    const legacyIdx = users.findIndex((u) => String(u.email || '').toLowerCase() === legacyEmail)
+    if (legacyIdx < 0) continue
+    const gmailIdx = users.findIndex((u) => String(u.email || '').toLowerCase() === SUPERADMIN_EMAIL)
+
+    if (gmailIdx < 0) {
+      // نقل حساب الأدمن القديم إلى البريد الجديد مع الإبقاء على كلمة المرور
+      users[legacyIdx] = {
+        ...users[legacyIdx],
+        email: SUPERADMIN_EMAIL,
+        role: 'superadmin',
+      }
+      mutated = true
+    } else if (gmailIdx !== legacyIdx) {
+      // البريد الجديد موجود مسبقاً: نحذف الحساب الجامعي القديم ليصبح متاحاً للتسجيل كطالب
+      users.splice(legacyIdx, 1)
+      mutated = true
+    }
+  }
+
+  users = users.map(withDefaults)
+  const prev = readUsers()
+  const changed =
+    mutated ||
+    users.length !== prev.length ||
+    users.some((u, i) => prev[i]?.role !== u.role || prev[i]?.active !== u.active || prev[i]?.email !== u.email)
+
+  if (changed) writeUsers(users)
   return users
 }
 

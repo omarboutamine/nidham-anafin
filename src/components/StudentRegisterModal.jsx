@@ -5,7 +5,7 @@ import {
   ACADEMIC_YEAR_OPTIONS,
   PROFESSION_VALUES,
 } from '../config/registerOptions'
-import { createUser, findUserByEmail } from '../services/authStore'
+import { SUPERADMIN_EMAIL, createUser, findUserByEmail } from '../services/authStore'
 import {
   clearPendingOtp,
   createAndSendOtp,
@@ -13,6 +13,7 @@ import {
   readPendingOtp,
   verifyOtp,
 } from '../services/otpService'
+import DarkSelect from './DarkSelect'
 
 const EMPTY_FORM = {
   fullName: '',
@@ -78,6 +79,7 @@ export default function StudentRegisterModal({ open, onClose, t, dir, lang }) {
       const next = { ...prev, [key]: value }
       if (key === 'profession' && value !== PROFESSION_VALUES.STUDENT) {
         next.academicYear = ''
+        next.registrationNumber = ''
       }
       return next
     })
@@ -107,7 +109,9 @@ export default function StudentRegisterModal({ open, onClose, t, dir, lang }) {
       return r.errors.academicYear
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) return r.errors.email
-    if (!isAlgerianUniversityEmail(form.email)) return r.errors.universityEmail
+    if (!isAlgerianUniversityEmail(form.email) && form.email.trim().toLowerCase() !== SUPERADMIN_EMAIL) {
+      return r.errors.universityEmail
+    }
     if (!/^[0-9+\s()-]{8,20}$/.test(form.phone.trim())) return r.errors.phone
     if (findUserByEmail(form.email)) return r.errors.emailExists
     return ''
@@ -128,7 +132,8 @@ export default function StudentRegisterModal({ open, onClose, t, dir, lang }) {
         fullName: form.fullName.trim(),
         birthDate: form.birthDate,
         birthPlace: form.birthPlace.trim(),
-        registrationNumber: form.registrationNumber.trim(),
+        registrationNumber:
+          form.profession === PROFESSION_VALUES.STUDENT ? form.registrationNumber.trim() : '',
         profession: form.profession,
         academicYear: form.profession === PROFESSION_VALUES.STUDENT ? form.academicYear : '',
         email: form.email.trim().toLowerCase(),
@@ -173,7 +178,8 @@ export default function StudentRegisterModal({ open, onClose, t, dir, lang }) {
         fullName: form.fullName.trim(),
         birthDate: form.birthDate,
         birthPlace: form.birthPlace.trim(),
-        registrationNumber: form.registrationNumber.trim(),
+        registrationNumber:
+          form.profession === PROFESSION_VALUES.STUDENT ? form.registrationNumber.trim() : '',
         profession: form.profession,
         academicYear: form.profession === PROFESSION_VALUES.STUDENT ? form.academicYear : '',
         email: form.email.trim().toLowerCase(),
@@ -300,39 +306,44 @@ export default function StudentRegisterModal({ open, onClose, t, dir, lang }) {
                   <input className="register-input" value={form.birthPlace} onChange={update('birthPlace')} required />
                 </label>
                 <label className="register-label">
-                  {r.registrationNumber}
-                  <input
-                    className="register-input"
-                    value={form.registrationNumber}
-                    onChange={update('registrationNumber')}
-                    placeholder={r.registrationNumberOptional}
-                    autoComplete="off"
-                  />
-                </label>
-                <label className="register-label">
                   {r.profession}
-                  <select className="register-input" value={form.profession} onChange={update('profession')} required>
-                    <option value={PROFESSION_VALUES.NONE}>{r.professionPlaceholder}</option>
-                    <option value={PROFESSION_VALUES.STUDENT}>{r.professionStudent}</option>
-                    <option value={PROFESSION_VALUES.PROFESSOR}>{r.professionProfessor}</option>
-                  </select>
+                  <DarkSelect
+                    value={form.profession}
+                    onChange={update('profession')}
+                    required
+                    aria-label={r.profession}
+                    options={[
+                      { value: PROFESSION_VALUES.NONE, label: r.professionPlaceholder },
+                      { value: PROFESSION_VALUES.STUDENT, label: r.professionStudent },
+                      { value: PROFESSION_VALUES.PROFESSOR, label: r.professionProfessor },
+                    ]}
+                  />
                 </label>
                 {form.profession === PROFESSION_VALUES.STUDENT && (
                   <label className="register-label">
-                    {r.academicYear}
-                    <select
+                    {r.registrationNumber}
+                    <input
                       className="register-input"
+                      value={form.registrationNumber}
+                      onChange={update('registrationNumber')}
+                      placeholder={r.registrationNumberOptional}
+                      autoComplete="off"
+                    />
+                  </label>
+                )}
+                {form.profession === PROFESSION_VALUES.STUDENT && (
+                  <label className="register-label">
+                    {r.academicYear}
+                    <DarkSelect
                       value={form.academicYear}
                       onChange={update('academicYear')}
                       required
-                    >
-                      <option value="">{r.academicYearPlaceholder}</option>
-                      {yearOptions.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
+                      aria-label={r.academicYear}
+                      options={[
+                        { value: '', label: r.academicYearPlaceholder },
+                        ...yearOptions.map((opt) => ({ value: opt.value, label: opt.label })),
+                      ]}
+                    />
                   </label>
                 )}
                 <label className="register-label">

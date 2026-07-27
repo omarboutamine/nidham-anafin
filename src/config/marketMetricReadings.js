@@ -135,7 +135,7 @@ const COPY = {
       },
     },
     bfr: {
-      explain: 'BFR ≈ أصول جارية − خصوم جارية (تقريب ميزاني). احتياج أو مورد دورة الاستغلال.',
+      explain: 'BFR التشغيلي = (أصول جارية − خزينة) − (خصوم جارية − تسبيقات بنكية). احتياج أو مورد دورة الاستغلال.',
       cases: '• > 0: الاحتياج يجمّد سيولة.\n• < 0: الدورة تموّل جزئياً نفسها.\n• يُقرأ دائماً مع FRNG (TN = FRNG − BFR).',
       verdict: (v, ctx) => {
         if (v == null) return 'لا يمكن حساب BFR.'
@@ -385,7 +385,7 @@ const COPY = {
       },
     },
     bfr: {
-      explain: 'BFR ≈ Actif courant − Passif courant.',
+      explain: 'BFR d’exploitation = (Actif courant − trésorerie) − (Passif courant − concours bancaires).',
       cases: '• > 0 : besoin.\n• < 0 : ressource.\n• Lire avec FRNG.',
       verdict: (v, ctx) => {
         if (v == null) return 'BFR non calculable.'

@@ -139,7 +139,6 @@ export default function BilanManual({ user, t, lang }) {
               <table className="fin-table">
                 <thead>
                   <tr>
-                    <th>{f.colNumber}</th>
                     <th>{f.colLabel}</th>
                     <th>{f.colAmount}</th>
                     <th aria-label={f.remove} />
@@ -148,13 +147,6 @@ export default function BilanManual({ user, t, lang }) {
                 <tbody>
                   {rows.map((row) => (
                     <tr key={row.id}>
-                      <td>
-                        <input
-                          className="fin-input fin-input--num"
-                          value={row.number}
-                          onChange={(e) => updateRow(row.id, { number: e.target.value })}
-                        />
-                      </td>
                       <td>
                         <input
                           className="fin-input"
@@ -184,14 +176,14 @@ export default function BilanManual({ user, t, lang }) {
                     </tr>
                   ))}
                   <tr className="fin-row-add">
-                    <td colSpan={4}>
+                    <td colSpan={3}>
                       <button type="button" className="fin-add-btn" onClick={() => addRow(sec.key)}>
                         + {f.addLine}
                       </button>
                     </td>
                   </tr>
                   <tr className="fin-row-subtotal">
-                    <td colSpan={2}>
+                    <td>
                       {f.subtotal} {sectionLabel(sec, lang)}
                     </td>
                     <td className="fin-amount">{formatMoney(totals.bySection[sec.key], lang)}</td>

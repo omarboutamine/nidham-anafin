@@ -26,6 +26,9 @@
 
 html {
   scroll-behavior: smooth;
+  color-scheme: dark;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.5) #0a0e1a;
 }
 
 body {
@@ -37,6 +40,46 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
+  color-scheme: dark;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.5) #0a0e1a;
+}
+
+/* Dark gold scrollbars — html/body + all panes (landing + dashboard) */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track {
+  background: #0a0e1a;
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.45);
+  border-radius: 999px;
+  border: 2px solid #0a0e1a;
+  background-clip: padding-box;
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.75);
+  border: 2px solid #0a0e1a;
+  background-clip: padding-box;
+}
+
+html::-webkit-scrollbar-corner,
+body::-webkit-scrollbar-corner,
+*::-webkit-scrollbar-corner {
+  background: #0a0e1a;
 }
 
 #root {
@@ -53,6 +96,18 @@ input,
 select,
 textarea {
   font-family: inherit;
+}
+
+/* Native selects: dark popup + readable options site-wide */
+select {
+  color-scheme: dark;
+  cursor: pointer;
+}
+
+select option,
+select optgroup {
+  background-color: #111827;
+  color: #f9fafb;
 }
 
 button {

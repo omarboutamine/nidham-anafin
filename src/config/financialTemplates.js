@@ -53,6 +53,14 @@ export const DEFAULT_BILAN_ROWS = [
   { id: 'p401', section: 'passifCourant', number: '401', labelFr: 'Fournisseurs', labelAr: 'الموردون', amount: '' },
   { id: 'p42', section: 'passifCourant', number: '42', labelFr: 'Personnel', labelAr: 'المستخدمون', amount: '' },
   { id: 'p44', section: 'passifCourant', number: '44', labelFr: 'État — impôts et taxes', labelAr: 'الدولة — الضرائب والرسوم', amount: '' },
+  {
+    id: 'p519',
+    section: 'passifCourant',
+    number: '519',
+    labelFr: 'Concours bancaires courants',
+    labelAr: 'تسبيقات وقروض بنكية جارية',
+    amount: '',
+  },
 ]
 
 /** TCR leaf inputs (editable). Computed SCF lines derive from these. */

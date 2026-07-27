@@ -1,17 +1,13 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { BILAN_SECTIONS, formatMoney, n } from '../config/financialTemplates'
+import { formatMoney } from '../config/financialTemplates'
 import { buildStructureMetricInfo } from '../config/structureMetricReadings'
 import { useLandingLang } from '../hooks/useLandingLang'
 import { loadFinancial } from '../services/financialStore'
+import { computeStructureMetrics } from '../services/structureMetrics'
 import MetricInfo from './MetricInfo'
 import NeedCompanyNotice from './NeedCompanyNotice'
 import YearToolbar from './YearToolbar'
-
-function pct(part, total) {
-  if (!total) return 0
-  return (part / total) * 100
-}
 
 function Meter({ value, label }) {
   const width = Math.max(0, Math.min(100, value))
@@ -49,42 +45,7 @@ export default function StructureAnalysis({ user }) {
   const [state, setState] = useState(() => loadFinancial(user.id))
   const year = state.activeYear || state.exerciseLabel
 
-  const metrics = useMemo(() => {
-    const bySection = {}
-    for (const key of Object.keys(BILAN_SECTIONS)) bySection[key] = 0
-    for (const row of state.bilanRows || []) {
-      bySection[row.section] = (bySection[row.section] || 0) + n(row.amount)
-    }
-    const actifCourant = bySection.actifCourant
-    const actifNonCourant = bySection.actifNonCourant
-    const totalActif = actifCourant + actifNonCourant
-    const passifCourant = bySection.passifCourant
-    const passifNonCourant = bySection.passifNonCourant
-    const capitaux = bySection.capitauxPropres
-    const totalPassif = passifCourant + passifNonCourant + capitaux
-    const frng = capitaux + passifNonCourant - actifNonCourant
-    const bfr = actifCourant - passifCourant
-    const tresorerie = frng - bfr
-
-    return {
-      totalActif,
-      totalPassif,
-      actifCourant,
-      actifNonCourant,
-      passifCourant,
-      passifNonCourant,
-      capitaux,
-      shareCourant: pct(actifCourant, totalActif),
-      shareNonCourant: pct(actifNonCourant, totalActif),
-      shareEquity: pct(capitaux, totalPassif),
-      shareDebt: pct(passifCourant + passifNonCourant, totalPassif),
-      liquidity: passifCourant ? actifCourant / passifCourant : null,
-      frng,
-      bfr,
-      tresorerie,
-      empty: totalActif === 0 && totalPassif === 0,
-    }
-  }, [state])
+  const metrics = useMemo(() => computeStructureMetrics(state.bilanRows), [state.bilanRows])
 
   const infos = useMemo(
     () => ({

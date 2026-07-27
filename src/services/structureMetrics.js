@@ -9,7 +9,6 @@ function pct(part, total) {
 export function computeStructureMetrics(bilanRows) {
   const b = sumBilanBySection(bilanRows)
   const empty = b.totalActif === 0 && b.totalPassif === 0
-  const tresorerie = b.frng - b.bfr
   return {
     totalActif: b.totalActif,
     totalPassif: b.totalPassif,
@@ -25,7 +24,7 @@ export function computeStructureMetrics(bilanRows) {
     liquidity: b.passifCourant ? b.actifCourant / b.passifCourant : null,
     frng: b.frng,
     bfr: b.bfr,
-    tresorerie,
+    tresorerie: b.tresorerieNette,
     empty,
   }
 }

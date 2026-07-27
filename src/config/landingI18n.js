@@ -270,9 +270,9 @@ const content = {
       frngReading:
         'يقيس هامش الأمان طويل الأجل. FRNG موجب يعني أن الموارد الدائمة تموّل التثبيتات وتفيض لتمويل جزء من دورة الاستغلال.',
       bfr: 'احتياج رأس المال العامل',
-      bfrHint: 'أصول جارية − خصوم جارية.',
+      bfrHint: '(أصول جارية − خزينة أصول) − (خصوم جارية − تسبيقات بنكية).',
       bfrReading:
-        'يعبّر عن الاحتياج التمويلي الناجم عن دورة الاستغلال (مخزون وزبائن مقابل موردين وخصوم جارية). ارتفاعه يزيد الضغط على الخزينة.',
+        'يعبّر عن الاحتياج التمويلي الناجم عن دورة الاستغلال (مخزون وزبائن مقابل موردين وخصوم جارية تشغيلية). ارتفاعه يزيد الضغط على الخزينة.',
       structureOverviewFormula: 'قراءة مركّبة لهيكل الأصول والخصوم + السيولة + FRNG + BFR + الخزينة',
       structureOverviewIntro: 'قراءة إجمالية للهيكل المالي انطلاقاً من المؤشرات الجزئية:',
       structureOverviewActif: 'هيكل الأصول: الأصول الجارية تمثل {courant}% مقابل {nonCourant}% غير جارية.',
@@ -643,9 +643,9 @@ const content = {
       frngReading:
         'Marge de sécurité long terme. Un FRNG positif signifie que les ressources durables financent les immobilisations et contribuent au cycle d’exploitation.',
       bfr: 'Besoin en fonds de roulement',
-      bfrHint: 'Actif courant − Passif courant.',
+      bfrHint: '(Actif courant − trésorerie actif) − (Passif courant − concours bancaires).',
       bfrReading:
-        'Besoin de financement lié au cycle d’exploitation (stocks et clients vs fournisseurs). Sa hausse accentue la pression sur la trésorerie.',
+        'Besoin de financement lié au cycle d’exploitation (stocks et clients vs fournisseurs, hors trésorerie). Sa hausse accentue la pression sur la trésorerie.',
       structureOverviewFormula:
         'Lecture combinée : structure Actif/Passif + liquidité + FRNG + BFR + trésorerie',
       structureOverviewIntro: 'Lecture globale de la structure financière à partir des indicateurs partiels :',

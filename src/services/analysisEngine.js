@@ -1,5 +1,54 @@
 import { BILAN_SECTIONS, computeTcr, n } from '../config/financialTemplates'
 
+function rowSearchText(row) {
+  return [row?.id, row?.number, row?.labelFr, row?.labelAr, row?.label]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+}
+
+/** SCF class 3 stocks — by account, template id, or label (works without visible N° compte). */
+function isStockRow(row) {
+  if (!row || row.section !== 'actifCourant') return false
+  const id = String(row.id || '')
+  if (id === 'a30') return true
+  const num = String(row.number ?? '').trim()
+  if (/^3\d*$/.test(num)) return true
+  const t = rowSearchText(row)
+  return /stocks?|encours|en-cours|en cours|مخزون|منتجات قيد/.test(t)
+}
+
+function isClientRow(row) {
+  if (!row || row.section !== 'actifCourant') return false
+  if (String(row.id || '') === 'a41') return true
+  const num = String(row.number ?? '').trim()
+  if (/^41\d*$/.test(num)) return true
+  const t = rowSearchText(row)
+  return /clients?|cr[eé]ances clients|زبائن|عملاء/.test(t)
+}
+
+/** Disponibilités (class 5) — banques, caisse, trésorerie actif. */
+function isTreasuryActifRow(row) {
+  if (!row || row.section !== 'actifCourant') return false
+  const id = String(row.id || '')
+  if (id === 'a512' || id === 'a53' || id === 'a50' || id === 'a51') return true
+  const num = String(row.number ?? '').trim()
+  if (/^5\d*$/.test(num)) return true
+  const t = rowSearchText(row)
+  return /banques?|caisse|tr[eé]sorerie|disponibilit|placement.?court|بنوك|بنك|صندوق|خزينة|نقد|سيولة نقد/.test(t)
+}
+
+/** Concours bancaires / trésorerie passif (exclu du BFR d’exploitation). */
+function isTreasuryPassifRow(row) {
+  if (!row || row.section !== 'passifCourant') return false
+  const id = String(row.id || '')
+  if (id === 'p519' || id === 'p52') return true
+  const num = String(row.number ?? '').trim()
+  if (/^519/.test(num) || /^52\d*/.test(num)) return true
+  const t = rowSearchText(row)
+  return /concours bancaire|d[eé]couvert|cr[eé]dits? de tr[eé]sorerie|banque.?cr[eé]dit|سحب على المكشوف|قروض بنكية جارية|تسبيقات بنكية|اعتمادات بنكية/.test(t)
+}
+
 export function sumBilanBySection(bilanRows) {
   const bySection = {}
   for (const key of Object.keys(BILAN_SECTIONS)) bySection[key] = 0
@@ -13,18 +62,15 @@ export function sumBilanBySection(bilanRows) {
   const passifNonCourant = bySection.passifNonCourant
   const capitaux = bySection.capitauxPropres
   const totalPassif = passifCourant + passifNonCourant + capitaux
-  const stocks = (bilanRows || [])
-    .filter((r) => String(r.number).startsWith('3'))
-    .reduce((s, r) => s + n(r.amount), 0)
-  const clients = (bilanRows || [])
-    .filter((r) => String(r.number).startsWith('41'))
-    .reduce((s, r) => s + n(r.amount), 0)
-  const tresorerieActif = (bilanRows || [])
-    .filter((r) => {
-      const num = String(r.number)
-      return num.startsWith('5')
-    })
-    .reduce((s, r) => s + n(r.amount), 0)
+  const stocks = (bilanRows || []).filter(isStockRow).reduce((s, r) => s + n(r.amount), 0)
+  const clients = (bilanRows || []).filter(isClientRow).reduce((s, r) => s + n(r.amount), 0)
+  const tresorerieActif = (bilanRows || []).filter(isTreasuryActifRow).reduce((s, r) => s + n(r.amount), 0)
+  const tresoreriePassif = (bilanRows || []).filter(isTreasuryPassifRow).reduce((s, r) => s + n(r.amount), 0)
+  // BFR d’exploitation : AC hors trésorerie − PC hors concours bancaires
+  // sinon FRNG − (AC − PC) = 0 دائماً عند توازن الميزانية
+  const bfr = actifCourant - tresorerieActif - (passifCourant - tresoreriePassif)
+  const frng = capitaux + passifNonCourant - actifNonCourant
+  const tresorerieNette = tresorerieActif - tresoreriePassif
 
   return {
     bySection,
@@ -38,8 +84,10 @@ export function sumBilanBySection(bilanRows) {
     stocks,
     clients,
     tresorerieActif,
-    frng: capitaux + passifNonCourant - actifNonCourant,
-    bfr: actifCourant - passifCourant,
+    tresoreriePassif,
+    frng,
+    bfr,
+    tresorerieNette,
   }
 }
 
@@ -103,7 +151,7 @@ export function computeFundamentals(yearData) {
     conanScore = 0.16 * x1 + 0.22 * x2 + 0.87 * x3 + 0.1 * x4 - 0.11 * x5
   }
 
-  const tresorerieNette = b.frng - b.bfr
+  const tresorerieNette = b.tresorerieNette ?? b.frng - b.bfr
 
   return {
     bilan: b,

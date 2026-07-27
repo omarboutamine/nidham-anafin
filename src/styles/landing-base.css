@@ -701,3 +701,41 @@
     visibility: visible;
   }
 }
+
+/* Landing page: force dark gold page scrollbar (Windows Chrome viewport) */
+.landing,
+.landing--ar,
+.landing--fr {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.5) #0a0e1a;
+}
+
+html:has(.landing),
+body:has(.landing) {
+  color-scheme: dark;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.5) #0a0e1a;
+}
+
+html:has(.landing)::-webkit-scrollbar,
+body:has(.landing)::-webkit-scrollbar {
+  width: 10px;
+}
+
+html:has(.landing)::-webkit-scrollbar-track,
+body:has(.landing)::-webkit-scrollbar-track {
+  background: #0a0e1a;
+}
+
+html:has(.landing)::-webkit-scrollbar-thumb,
+body:has(.landing)::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.5);
+  border-radius: 999px;
+  border: 2px solid #0a0e1a;
+  background-clip: padding-box;
+}
+
+html:has(.landing)::-webkit-scrollbar-thumb:hover,
+body:has(.landing)::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.8);
+}

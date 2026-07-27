@@ -133,6 +133,8 @@ button.dash-header-nav__btn:disabled {
   flex: 1;
   overflow-y: auto;
   overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.4) transparent;
 }
 
 .dash-sidebar__icon {
@@ -961,6 +963,37 @@ button.dash-header-nav__btn:disabled {
   font: inherit;
 }
 
+select.fin-input {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-inline-end: 2.1rem;
+  background-color: rgba(10, 14, 26, 0.92);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23d4af37' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 0.7rem center;
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+[dir='ltr'] select.fin-input {
+  background-position: right 0.7rem center;
+}
+
+select.fin-input:hover {
+  border-color: rgba(212, 175, 55, 0.45);
+}
+
+select.fin-input:focus {
+  border-color: rgba(212, 175, 55, 0.7);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+select.fin-input option {
+  background-color: #111827;
+  color: #f9fafb;
+  padding: 0.45rem 0.55rem;
+}
+
 .fin-input--num {
   width: 4.2rem;
   font-family: var(--font-mono, ui-monospace, monospace);
@@ -1203,12 +1236,13 @@ button.dash-header-nav__btn:disabled {
 .metric-info-modal {
   position: fixed;
   inset: 0;
-  z-index: 80;
+  z-index: 200;
   background: rgba(5, 8, 16, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
+  cursor: pointer;
 }
 
 .metric-info-modal__dialog {
@@ -1223,6 +1257,7 @@ button.dash-header-nav__btn:disabled {
   flex-direction: column;
   gap: 0.65rem;
   outline: none;
+  cursor: default;
 }
 
 .metric-info-modal__title {
@@ -1281,11 +1316,6 @@ button.dash-header-nav__btn:disabled {
 
 .metric-info-modal__cases {
   white-space: pre-line;
-}
-
-.metric-info-modal__close {
-  align-self: flex-end;
-  margin-top: 0.35rem;
 }
 
 .analysis-kpi strong {

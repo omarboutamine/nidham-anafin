@@ -8,6 +8,7 @@ import {
   removeCompany,
   setActiveCompany,
 } from '../services/companyStore'
+import DarkSelect from './DarkSelect'
 
 const EMPTY_FORM = {
   name: '',
@@ -145,25 +146,33 @@ export default function DashboardCompanies({ user, t, lang }) {
 
             <label className="company-field">
               <span>{c.legalForm}</span>
-              <select className="fin-input" value={form.legalForm} onChange={onChange('legalForm')}>
-                {LEGAL_FORM_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {lang === 'fr' ? opt.fr : opt.ar}
-                  </option>
-                ))}
-              </select>
+              <DarkSelect
+                className="dark-select--compact"
+                value={form.legalForm}
+                onChange={onChange('legalForm')}
+                aria-label={c.legalForm}
+                options={LEGAL_FORM_OPTIONS.map((opt) => ({
+                  value: opt.value,
+                  label: lang === 'fr' ? opt.fr : opt.ar,
+                }))}
+              />
             </label>
 
             <label className="company-field">
               <span>{c.wilaya}</span>
-              <select className="fin-input" value={form.wilaya} onChange={onChange('wilaya')}>
-                <option value="">{c.wilayaPlaceholder}</option>
-                {WILAYA_OPTIONS.map((w) => (
-                  <option key={w.code} value={w.code}>
-                    {w.code} — {lang === 'fr' ? w.fr : w.ar}
-                  </option>
-                ))}
-              </select>
+              <DarkSelect
+                className="dark-select--compact"
+                value={form.wilaya}
+                onChange={onChange('wilaya')}
+                aria-label={c.wilaya}
+                options={[
+                  { value: '', label: c.wilayaPlaceholder },
+                  ...WILAYA_OPTIONS.map((w) => ({
+                    value: w.code,
+                    label: `${w.code} — ${lang === 'fr' ? w.fr : w.ar}`,
+                  })),
+                ]}
+              />
             </label>
 
             <label className="company-field">

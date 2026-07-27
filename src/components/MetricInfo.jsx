@@ -1,7 +1,9 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 /**
  * ! button: hover = live verdict only; click = explain + academic cases + verdict.
+ * Modal closes on outside click or Escape (no OK button).
  */
 export default function MetricInfo({
   title,
@@ -13,7 +15,7 @@ export default function MetricInfo({
   /** @deprecated use explanation */
   formula,
   sectionLabels,
-  closeLabel = 'OK',
+  closeLabel: _closeLabel = 'OK',
 }) {
   const [open, setOpen] = useState(false)
   const dialogRef = useRef(null)
@@ -62,48 +64,52 @@ export default function MetricInfo({
         </span>
       </button>
 
-      {open && (
-        <div className="metric-info-modal" role="presentation" onClick={() => setOpen(false)}>
+      {open &&
+        createPortal(
           <div
-            className="metric-info-modal__dialog"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby={`${tipId}-title`}
-            tabIndex={-1}
-            ref={dialogRef}
-            onClick={(e) => e.stopPropagation()}
+            className="metric-info-modal"
+            role="presentation"
+            onMouseDown={(e) => {
+              if (e.target === e.currentTarget) setOpen(false)
+            }}
           >
-            <h3 id={`${tipId}-title`} className="metric-info-modal__title">
-              {title}
-            </h3>
+            <div
+              className="metric-info-modal__dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={`${tipId}-title`}
+              tabIndex={-1}
+              ref={dialogRef}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              <h3 id={`${tipId}-title`} className="metric-info-modal__title">
+                {title}
+              </h3>
 
-            {explain && (
-              <div className="metric-info-modal__block">
-                <h4>{labels.explain}</h4>
-                <p>{explain}</p>
-              </div>
-            )}
+              {explain && (
+                <div className="metric-info-modal__block">
+                  <h4>{labels.explain}</h4>
+                  <p>{explain}</p>
+                </div>
+              )}
 
-            {academic && (
-              <div className="metric-info-modal__block">
-                <h4>{labels.cases}</h4>
-                <p className="metric-info-modal__cases">{academic}</p>
-              </div>
-            )}
+              {academic && (
+                <div className="metric-info-modal__block">
+                  <h4>{labels.cases}</h4>
+                  <p className="metric-info-modal__cases">{academic}</p>
+                </div>
+              )}
 
-            {live && (
-              <div className="metric-info-modal__block metric-info-modal__block--verdict">
-                <h4>{labels.verdict}</h4>
-                <p>{live}</p>
-              </div>
-            )}
-
-            <button type="button" className="btn btn-primary metric-info-modal__close" onClick={() => setOpen(false)}>
-              {closeLabel}
-            </button>
-          </div>
-        </div>
-      )}
+              {live && (
+                <div className="metric-info-modal__block metric-info-modal__block--verdict">
+                  <h4>{labels.verdict}</h4>
+                  <p>{live}</p>
+                </div>
+              )}
+            </div>
+          </div>,
+          document.body,
+        )}
     </span>
   )
 }

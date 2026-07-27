@@ -107,7 +107,7 @@ const COPY = {
       },
     },
     bfr: {
-      explain: 'BFR (تبسيط ميزانياتي) ≈ أصول جارية − خصوم جارية. يقرّب الاحتياج التمويلي لدورة الاستغلال.',
+      explain: 'BFR التشغيلي = (أصول جارية − خزينة أصول) − (خصوم جارية − تسبيقات بنكية). يقرّب الاحتياج التمويلي لدورة الاستغلال.',
       cases:
         '• BFR > 0: النشاط يجمّد سيولة (مخزون/زبائن أكبر من تمويل الموردين) → يحتاج تمويلاً.\n• BFR < 0: الدورة تولّد موارد (تمويل مورّدين أقوى من الاستخدامات الجارية).\n• يُقرأ دائماً مع FRNG لأن TN = FRNG − BFR.',
       verdict: ({ value, lang }) => {
@@ -241,7 +241,7 @@ const COPY = {
       },
     },
     bfr: {
-      explain: 'BFR (approximation bilan) ≈ Actif courant − Passif courant. Besoin (ou ressource) du cycle d’exploitation.',
+      explain: 'BFR d’exploitation = (Actif courant − trésorerie actif) − (Passif courant − concours bancaires). Besoin (ou ressource) du cycle d’exploitation.',
       cases:
         '• BFR > 0 : l’exploitation immobilise du cash.\n• BFR < 0 : l’exploitation dégage une ressource.\n• Toujours lire avec FRNG (TN = FRNG − BFR).',
       verdict: ({ value, lang }) => {

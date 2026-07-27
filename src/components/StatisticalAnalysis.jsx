@@ -37,6 +37,7 @@ import {
 } from '../services/statsEngine'
 import { listStatsSessions, removeStatsSession, saveStatsSession } from '../services/statsSessions'
 import MetricInfo from './MetricInfo'
+import DarkSelect from './DarkSelect'
 import NeedCompanyNotice from './NeedCompanyNotice'
 
 function SectionTitle({ title, sectionId, lang, closeLabel }) {
@@ -357,13 +358,13 @@ export default function StatisticalAnalysis({ user }) {
           </div>
           <label className="stats-field">
             <span>{s.compareVar}</span>
-            <select className="fin-input" value={compareVar} onChange={(e) => setCompareVar(e.target.value)}>
-              {STAT_VAR_DEFS.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {labelOf(d.id)}
-                </option>
-              ))}
-            </select>
+            <DarkSelect
+              className="dark-select--compact"
+              value={compareVar}
+              onChange={(e) => setCompareVar(e.target.value)}
+              aria-label={s.compareVar}
+              options={STAT_VAR_DEFS.map((d) => ({ value: d.id, label: labelOf(d.id) }))}
+            />
           </label>
           {!multiCompanies.length ? (
             <p>{s.noCompanies}</p>
@@ -567,23 +568,23 @@ export default function StatisticalAnalysis({ user }) {
                 <div className="stats-reg-controls">
                   <label className="stats-field">
                     <span>{s.yVar}</span>
-                    <select className="fin-input" value={yVar} onChange={(e) => setYVar(e.target.value)}>
-                      {availableVars.map((id) => (
-                        <option key={id} value={id}>
-                          {labelOf(id)}
-                        </option>
-                      ))}
-                    </select>
+                    <DarkSelect
+                      className="dark-select--compact"
+                      value={yVar}
+                      onChange={(e) => setYVar(e.target.value)}
+                      aria-label={s.yVar}
+                      options={availableVars.map((id) => ({ value: id, label: labelOf(id) }))}
+                    />
                   </label>
                   <label className="stats-field">
                     <span>{s.xVar}</span>
-                    <select className="fin-input" value={xVar} onChange={(e) => setXVar(e.target.value)}>
-                      {availableVars.map((id) => (
-                        <option key={id} value={id}>
-                          {labelOf(id)}
-                        </option>
-                      ))}
-                    </select>
+                    <DarkSelect
+                      className="dark-select--compact"
+                      value={xVar}
+                      onChange={(e) => setXVar(e.target.value)}
+                      aria-label={s.xVar}
+                      options={availableVars.map((id) => ({ value: id, label: labelOf(id) }))}
+                    />
                   </label>
                 </div>
                 {simpleReg.ok ? (

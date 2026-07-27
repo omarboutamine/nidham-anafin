@@ -6,8 +6,9 @@ const PURGE_NON_ADMIN_FLAG = 'anafin_purge_non_admin_v1'
 /** Bootstrap superadmin mailbox (site owner). */
 export const SUPERADMIN_EMAIL = 'omarboutamine00@gmail.com'
 
-/** Previous admin mailbox — migrated once to SUPERADMIN_EMAIL in localStorage. */
+/** Previous admin mailbox — one-time rename only (never delete student accounts). */
 const LEGACY_SUPERADMIN_EMAILS = ['omar.boutamine@univ-constantine2.dz']
+const LEGACY_ADMIN_MIGRATION_FLAG = 'anafin_admin_email_migrated_v1'
 
 function readUsers() {
   try {
@@ -97,24 +98,24 @@ function migrateUsers() {
   let users = readUsers()
   let mutated = false
 
-  for (const legacyEmail of LEGACY_SUPERADMIN_EMAILS) {
-    const legacyIdx = users.findIndex((u) => String(u.email || '').toLowerCase() === legacyEmail)
-    if (legacyIdx < 0) continue
-    const gmailIdx = users.findIndex((u) => String(u.email || '').toLowerCase() === SUPERADMIN_EMAIL)
-
-    if (gmailIdx < 0) {
-      // نقل حساب الأدمن القديم إلى البريد الجديد مع الإبقاء على كلمة المرور
-      users[legacyIdx] = {
-        ...users[legacyIdx],
-        email: SUPERADMIN_EMAIL,
-        role: 'superadmin',
+  // One-shot: rename old admin mailbox → Gmail. Never delete university student accounts.
+  if (localStorage.getItem(LEGACY_ADMIN_MIGRATION_FLAG) !== '1') {
+    for (const legacyEmail of LEGACY_SUPERADMIN_EMAILS) {
+      const legacyIdx = users.findIndex((u) => String(u.email || '').toLowerCase() === legacyEmail)
+      if (legacyIdx < 0) continue
+      const legacyUser = users[legacyIdx]
+      const gmailExists = users.some((u) => String(u.email || '').toLowerCase() === SUPERADMIN_EMAIL)
+      if (!gmailExists && legacyUser.role === 'superadmin') {
+        users[legacyIdx] = {
+          ...legacyUser,
+          email: SUPERADMIN_EMAIL,
+          role: 'superadmin',
+        }
+        mutated = true
       }
-      mutated = true
-    } else if (gmailIdx !== legacyIdx) {
-      // البريد الجديد موجود مسبقاً: نحذف الحساب الجامعي القديم ليصبح متاحاً للتسجيل كطالب
-      users.splice(legacyIdx, 1)
-      mutated = true
     }
+    localStorage.setItem(LEGACY_ADMIN_MIGRATION_FLAG, '1')
+    mutated = true
   }
 
   const purged = purgeNonAdminUsers(users)
